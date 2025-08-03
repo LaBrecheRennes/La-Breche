@@ -679,6 +679,57 @@ function initializePopup() {
 }
 
 /**
+ * Soumet une inscription via Google Apps Script
+ * @param {string} circleName - Nom du cercle (nom de l'onglet)
+ * @param {string} firstName - Prénom de la personne
+ * @param {string} lastName - Nom de la personne  
+ * @param {string} email - Email de la personne
+ * @returns {Promise<boolean>} - true si succès, false sinon
+ */
+async function submitRegistrationToGoogleSheets(circleName, firstName, lastName, email) {
+    // URL du Google Apps Script déployé
+    const appsScriptUrl = 'https://script.google.com/macros/s/AKfycbw2z9eLYlfC-asXs95gbqMDgXDM7k8yNnXzfk1uV3u_Vlkoe09btvdGtEcaOgBMU0D1hw/exec';
+    
+    console.log(`Tentative d'inscription pour ${firstName} ${lastName} dans le cercle "${circleName}"`);
+    
+    try {
+        const response = await fetch(appsScriptUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                secretKey: 'la-breche-2025-inscription',
+                circleName: circleName,
+                firstName: firstName,
+                lastName: lastName,
+                email: email
+            })
+        });
+        
+        if (!response.ok) {
+            console.error('Erreur réseau:', response.status);
+            throw new Error(`Erreur réseau: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        console.log('Réponse du serveur:', result);
+        
+        if (result.success) {
+            console.log('Inscription réussie:', result.message);
+            return true;
+        } else {
+            console.error('Erreur d\'inscription:', result.message);
+            return false;
+        }
+        
+    } catch (error) {
+        console.error('Erreur lors de l\'inscription:', error);
+        return false;
+    }
+}
+
+/**
  * Initialise le formulaire d'inscription
  */
 function initializeForm() {
@@ -751,48 +802,21 @@ function initializeForm() {
                 return false;
             }
             
-            // Préparer les données à envoyer à l'API
-            const formData = {
-                firstName: firstName,
-                lastName: lastName,
-                email: email,
-                phone: phone
-            };
-            
-            // URL de l'API Google Apps Script
-            const apiUrl = 'https://script.google.com/macros/s/AKfycbynsyYR5GtOMpy6xomXTA0RUvHiHVLnvp77LHMP_51NcQcz4aZIvW36LYlzzF2lKzBXXQ/exec';
-            
-            // Envoyer les données à l'API
-            fetch(apiUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    secretKey: 'la-breche-2025',
-                    circleName: circle.title,
-                    formData: formData
-                })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Erreur réseau: ' + response.status);
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    // Inscription réussie
-                    console.log('Inscription réussie:', data);
-                    
-                    // Mettre à jour le nombre de places disponibles
-                    updateCircleDisplay(circleId, true);
-                    
-                    // Mettre à jour le titre du message de succès avec le nom du cercle
-                    const successMessageTitle = document.getElementById('popup-success-title');
-                    if (successMessageTitle) {
-                        successMessageTitle.textContent = `Inscription confirmée au ${circle.title}`;
-                    }
+            // Appeler la fonction d'inscription dans Google Sheets
+            submitRegistrationToGoogleSheets(circle.nom, firstName, lastName, email)
+                .then(success => {
+                    if (success) {
+                        // Inscription réussie
+                        console.log('Inscription réussie dans Google Sheets');
+                        
+                        // Mettre à jour le nombre de places disponibles
+                        updateCircleDisplay(circleId, true);
+                        
+                        // Mettre à jour le titre du message de succès avec le nom du cercle
+                        const successMessageTitle = document.getElementById('popup-success-title');
+                        if (successMessageTitle) {
+                            successMessageTitle.textContent = `Inscription confirmée au ${circle.nom}`;
+                        }
                     
                     // Cacher le formulaire et afficher le message de succès
                     document.getElementById('popup-form-container').style.display = 'none';
