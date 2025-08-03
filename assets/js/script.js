@@ -175,7 +175,7 @@ async function loadCirclesData() {
     
     // Afficher un message de débogage
     console.log('Début du chargement des cercles via API Google Sheets');
-    console.log(`Utilisation de l'ID de feuille: ${sheetId}`)
+    console.log(`Utilisation de l'ID de feuille: ${sheetId}`);
     
     try {
         // 1. Récupérer les informations sur le spreadsheet, incluant tous les onglets
@@ -193,13 +193,15 @@ async function loadCirclesData() {
         console.log('Réponse API reçue avec succès');
         
         const sheetsData = await sheetsResponse.json();
-        console.log('Données du spreadsheet reçues:', JSON.stringify(sheetsData).substring(0, 200) + '...');
+        console.log('Données du spreadsheet reçues');
         
         const sheets = sheetsData.sheets || [];
         console.log(`Nombre total d'onglets: ${sheets.length}`);
         
         // 2. Filtrer les onglets (exclure "Historique des cercles")
         const circleSheets = sheets.filter(sheet => 
+            sheet.properties && 
+            sheet.properties.title && 
             sheet.properties.title !== "Historique des cercles"
         );
         
@@ -211,102 +213,59 @@ async function loadCirclesData() {
         
         for (const sheet of circleSheets) {
             const sheetTitle = sheet.properties.title;
-            // Récupérer les colonnes B à E (indices 1-4) des lignes 1 à 50
-            const range = `${sheetTitle}!B1:E50`;
+            // Récupérer les données de cet onglet (prendre une plage suffisante)
+            const range = `${sheetTitle}!C1:C10`;
             
             // Requête pour récupérer les données de cet onglet
             const sheetUrl = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
-            console.log(`Récupération des données de l'onglet ${sheetTitle}: ${sheetUrl}`);
+            console.log(`Récupération des données de l'onglet ${sheetTitle}`);
             
             const response = await fetch(sheetUrl);
             
             if (!response.ok) {
                 const errorText = await response.text();
-                console.error(`Erreur lors de la récupération des données pour l'onglet ${sheetTitle}:`, response.status, errorText);
+                console.error(`Erreur lors de la récupération des données pour l'onglet ${sheetTitle}:`, response.status);
                 continue;
             }
             
-            console.log(`Données de l'onglet ${sheetTitle} reçues avec succès`);
+            console.log(`Données de l'onglet ${sheetTitle} reçues`);
             
             const data = await response.json();
             const values = data.values || [];
             
-            // Créer un objet cercle
-            const circle = {
-                id: sheetTitle.toLowerCase().replace(/\s+/g, '-'),
-                nom: sheetTitle
+            // Définir une fonction helper pour extraire une valeur spécifique
+            const getValue = (index) => {
+                return (values.length > index && values[index] && values[index][0]) ? values[index][0] : '';
             };
             
-            // Récupérer les valeurs spécifiques selon le nouveau mapping demandé
-            // C2: thématique
-            if (values && values.length >= 2 && values[1] && values[1].length >= 2) {
-                circle['thematique'] = values[1][1] || 'Thématique à confirmer';
-            }
+            // Créer un objet cercle avec les données de l'onglet
+            const circle = {
+                id: sheetTitle.toLowerCase().replace(/\s+/g, '-'),
+                nom: sheetTitle,
+                // Thématique = C2 (index 1 car C1 est à l'index 0)
+                thematique: getValue(1) || 'Thématique à confirmer',
+                // Nombre places max = C3 (index 2)
+                places_totales: parseInt(getValue(2), 10) || 20,
+                // Date et heure = C4 (index 3)
+                date: getValue(3) || 'Date à confirmer',
+                // Lieu = C5 (index 4)
+                lieu: getValue(4) || 'Lieu à confirmer',
+                // Places disponibles = C6 (index 5)
+                places_disponibles: parseInt(getValue(5), 10) || 0,
+                // Valeurs par défaut pour d'autres champs
+                description: `Cercle d'écoute sur ${getValue(1) || 'thématique à confirmer'}`,
+                referentes: 'Equipe La Brèche'
+            };
             
-            // C3: nombre de places maximum
-            if (values && values.length >= 3 && values[2] && values[2].length >= 2) {
-                const placesMax = parseInt(values[2][1], 10);
-                if (!isNaN(placesMax)) {
-                    circle['places_max'] = placesMax;
-                }
-            }
+            // S'assurer que places_disponibles n'est pas négatif
+            circle.places_disponibles = Math.max(0, circle.places_disponibles);
             
-            // C4: date et heure
-            if (values && values.length >= 4 && values[3] && values[3].length >= 2) {
-                circle['date'] = values[3][1] || 'Date à confirmer';
-            }
-            
-            // C5: lieu
-            if (values && values.length >= 5 && values[4] && values[4].length >= 2) {
-                circle['lieu'] = values[4][1] || 'Lieu à confirmer';
-            }
-            
-            // C6: nombre de places restantes
-            if (values && values.length >= 6 && values[5] && values[5].length >= 2) {
-                const placesRestantes = parseInt(values[5][1], 10);
-                if (!isNaN(placesRestantes)) {
-                    circle['places_disponibles'] = Math.max(0, placesRestantes);
-                }
-            }
-            
-            // Conserver le traitement des autres lignes pour compatibilité
-            for (let i = 1; i < values.length; i++) {
-                if (values[i] && values[i].length >= 2 && values[i][0]) {
-                    const key = values[i][0].toLowerCase().replace(/\s+/g, '_');
-                    // Éviter d'écraser les valeurs déjà définies par le nouveau mapping
-                    if (!['thematique', 'date', 'lieu', 'places_disponibles', 'places_max'].includes(key)) {
-                        circle[key] = values[i][1] || '';
-                    }
-                }
-            }
-            
-            // Compter le nombre de participants (colonne E moins 2)
-            const participantsRows = values.filter((row, index) => 
-                index > 0 && // Ignorer l'en-tête
-                row.length >= 4 && row[3] // Vérifier que la colonne E (indice 3) existe et n'est pas vide
-            );
-            
-            const participantsCount = Math.max(0, participantsRows.length - 2);
-            
-            // Ajouter les places totales
-            // Utiliser places_max si disponible (extrait de C2), sinon fallback sur les propriétés existantes
-            const capaciteTotale = circle.places_max || parseInt(circle.capacite_totale || circle.capacité_totale || "20");
-            circle.places_totales = capaciteTotale;
-            
-            // Si places_disponibles n'est pas déjà défini à partir de C6, le calculer comme avant
-            if (typeof circle.places_disponibles === 'undefined') {
-                circle.places_disponibles = Math.max(0, capaciteTotale - participantsCount);
-            }
-            
-            // S'assurer que toutes les propriétés nécessaires existent
-            circle.date = circle.date || "Date à confirmer";
-            circle.lieu = circle.lieu || "Lieu à confirmer";
-            circle.referentes = circle.referentes || "A confirmer";
-            circle.thematique = circle.thematique || "Thématique à confirmer";
-            circle.description = circle.description || circle.thematique || `Description du cercle ${sheetTitle}`;
-            
+            // Ajouter le cercle à la liste
             circlesData.push(circle);
+            console.log(`Cercle ajouté: ${circle.nom}, thématique: ${circle.thematique}, date: ${circle.date}, places: ${circle.places_disponibles}/${circle.places_totales}`);
         }
+        
+        console.log(`Total des cercles chargés: ${circlesData.length}`);
         
         // Si aucun cercle n'a été chargé, lancer une erreur
         if (circlesData.length === 0) {
@@ -379,8 +338,10 @@ function sortCirclesByDate(circles) {
  * @returns {Object} - Objet contenant année, mois, jour (grandes valeurs pour dates inconnues)
  */
 function extractDateComponents(dateString) {
-    if (!dateString) {
-        return { year: 9999, month: 12, day: 31 }; // Date très lointaine pour les dates vides
+    // Vérifier que dateString est bien une chaîne de caractères
+    if (!dateString || typeof dateString !== 'string') {
+        console.log(`Type invalide reçu dans extractDateComponents: ${typeof dateString}`, dateString);
+        return { year: 9999, month: 12, day: 31 }; // Date très lointaine pour les dates vides ou invalides
     }
     
     // Valeurs par défaut (date lointaine)
