@@ -1,97 +1,49 @@
-# Simple Registration Website
+# La Brèche - Site des Cercles d'Écoute
 
-A lightweight registration website that allows visitors to register with their name, surname, and email. Registrations are sent to an administrator's email, and the admin can control the number of available registration spots.
+Site web de l'association La Brèche de Rennes permettant l'affichage et l'inscription aux cercles d'écoute. Les événements sont gérés directement depuis un Google Sheet et affichés dynamiquement sur le site.
 
-## Features
+## Fonctionnalités
 
-- User registration form with name, surname, and email fields
-- Display of available registration spots
-- Admin panel to set the maximum number of available spots
-- Email notifications for new registrations
-- Simple data persistence using JSON file
-- Responsive design using Bootstrap 5
+- Affichage des cercles d'écoute disponibles avec leurs informations (thématique, lieu, date, places disponibles)
+- Chargement des données depuis Google Sheets
+- Interface responsive adaptée mobile/desktop
+- Thème personnalisé avec la charte graphique de La Brèche
 
-## Setup Instructions
+## Structure des données
 
-### Prerequisites
+Les cercles d'écoute sont structurés dans le Google Sheet comme suit :
+- Chaque onglet = un cercle (sauf l'onglet "Historique des cercles" qui est exclu)
+- Cellules importantes dans chaque onglet :
+  - C2 = Thématique du cercle
+  - C3 = Nombre de places maximum
+  - C4 = Date et heure
+  - C5 = Lieu
+  - C6 = Nombre de places disponibles
 
-- [Node.js](https://nodejs.org/) (v14 or newer)
-- A Gmail account or other email service for sending notifications
+## Structure du site
 
-### Installation
+- `accueil.html` - Page principale affichant les cercles disponibles
+- `assets/css/style.css` - Feuille de style
+- `assets/js/script.js` - Script principal gérant le chargement des données et l'affichage
+- `assets/images/` - Ressources images du site
 
-1. Clone the repository:
-   ```
-   git clone https://github.com/yourusername/simple-registration-site.git
-   cd simple-registration-site
-   ```
+## Déploiement
 
-2. Install dependencies:
-   ```
-   npm install
-   ```
+Le site est déployé sur GitHub Pages et accessible à l'adresse :
+https://labrecherennes.github.io/La-Breche/
 
-3. Create a `.env` file in the project root:
-   ```
-   cp .env.example .env
-   ```
+## Maintenance
 
-4. Edit the `.env` file with your email configuration:
-   ```
-   PORT=3000
-   EMAIL_SERVICE=gmail
-   EMAIL_USER=your-email@gmail.com
-   EMAIL_PASS=your-app-password
-   ADMIN_EMAIL=admin-email@example.com
-   ```
+Pour mettre à jour les informations des cercles :
+1. Modifier les données dans le Google Sheet connecté
+2. Les modifications apparaîtront automatiquement sur le site
 
-   > Note: If using Gmail, you'll need to use an [App Password](https://support.google.com/accounts/answer/185833) instead of your regular password.
+Pour modifier le code du site :
+1. Cloner le repository
+2. Effectuer les modifications nécessaires
+3. Pousser les changements sur la branche principale
 
-### Running the Application
+## Crédits
 
-1. Start the server:
-   ```
-   npm start
-   ```
-
-2. For development with auto-reload:
-   ```
-   npm run dev
-   ```
-
-3. Open your browser and navigate to:
-   ```
-   http://localhost:3000
-   ```
-
-### Usage
-
-#### User Registration
-- Visit the homepage to access the registration form
-- Fill in your name, surname, and email
-- Submit the form to register (if spots are available)
-
-#### Admin Panel
-- Access the admin panel via `/admin.html`
-- View current registrations
-- Update the total number of available spots
-
-## File Structure
-
-- `index.html` - Main registration page
-- `admin.html` - Admin panel
-- `css/styles.css` - Stylesheet
-- `js/main.js` - Frontend script for registration form
-- `js/admin.js` - Frontend script for admin panel
-- `server.js` - Express server handling API endpoints and serving static files
-- `data.json` - (Auto-generated) Data storage for registrations and available spots
-- `.env` - Environment variables for configuration
-
-## Customization
-
-- Edit `styles.css` to modify the appearance
-- Modify email templates in the `server.js` file
-
-## License
-
-MIT
+Développé pour l'association La Brèche - Rennes
+https://labreche-rennes.fr
