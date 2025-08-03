@@ -687,8 +687,10 @@ function initializePopup() {
  * @returns {Promise<boolean>} - true si succès, false sinon
  */
 async function submitRegistrationToGoogleSheets(circleName, firstName, lastName, email) {
-    // URL du Google Apps Script déployé
+    // URL du Google Apps Script déployé - Mise à jour 2025-08-03
     const appsScriptUrl = 'https://script.google.com/macros/s/AKfycbw2z9eLYlfC-asXs95gbqMDgXDM7k8yNnXzfk1uV3u_Vlkoe09btvdGtEcaOgBMU0D1hw/exec';
+    
+    console.log('URL Google Apps Script utilisée:', appsScriptUrl);
     
     console.log(`Tentative d'inscription pour ${firstName} ${lastName} dans le cercle "${circleName}"`);
     
