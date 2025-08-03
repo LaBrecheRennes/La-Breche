@@ -1,5 +1,9 @@
-// Structure des données pour les cercles
+// Structure des données pour les cercles - Version 2025-08-03-12:45
+// Cache invalidation timestamp: 1722681900
 let circles = [];
+
+// Debug: Vérification de la version du script
+console.log('Script version: 2025-08-03-12:45 - Cache invalidated');
 
 // Fonction pour animer une image de fond avec effet de fondu
 function animateBackgroundImage(elementId) {
