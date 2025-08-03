@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Inscription</title>
+</head>
+<body>
+  <h1>Formulaire d’inscription</h1>
+
+  <form id="my-form">
+    <label>Nom :      <input type="text"   name="nom"  required></label><br>
+    <label>Email :    <input type="email"  name="email" required></label><br>
+    <label>Commentaire :<br>
+       <textarea name="commentaire" required></textarea></label><br>
+    <button type="submit">Envoyer</button>
+  </form>
+
+  <script>
+    // 1. Remplacez ci-dessous par l’URL copiée au déploiement
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbz_EV78E-Nu6MJMVdiMzL09ZwJ2SxNox6_Sotm0PfVXm7Vs-edgXkLkPO2PC1QyhKHRvw/exec';
+
+    const form = document.getElementById('my-form');
+    form.addEventListener('submit', e => {
+      e.preventDefault();                         // empêche le rechargement
+      const data = new FormData(form);            // récupère les champs
+
+      fetch(scriptURL, { method: 'POST', body: data })
+        .then(response => {
+          if (!response.ok) throw new Error('Network response was not ok');
+          alert('Merci ! Votre inscription est enregistrée.');
+          form.reset();
+        })
+        .catch(error => alert('Erreur : ' + error.message));
+    });
+  </script>
+</body>
+</html>

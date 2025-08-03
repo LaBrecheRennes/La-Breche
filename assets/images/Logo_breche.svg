@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <!-- Logo La Brèche avec la nouvelle palette de couleurs -->
+    <style>
+        .text { font-family: 'Arial', sans-serif; font-weight: bold; }
+        .dark { fill: #2B2B2B; }
+        .purple { fill: #7A65BF; }
+        .beige { fill: #f3ecdb; }
+    </style>
+    
+    <!-- Fond -->
+    <circle cx="100" cy="100" r="95" class="beige" />
+    
+    <!-- Brèche/Fissure -->
+    <path d="M100,10 Q130,50 110,100 T100,190 Q70,150 90,100 T100,10" class="purple" />
+    
+    <!-- Contour -->
+    <circle cx="100" cy="100" r="95" fill="none" stroke="#2B2B2B" stroke-width="5" />
+    
+    <!-- Texte -->
+    <text x="50" y="135" class="text dark" font-size="28">LA BRÈCHE</text>
+</svg>

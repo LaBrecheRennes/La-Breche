@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animation Déchirure de Papier</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes tear-left {
+            0% {
+                transform: rotate(0deg) translateX(0);
+                opacity: 1;
+            }
+            100% {
+                transform: rotate(-15deg) translateX(-100%);
+                opacity: 0;
+            }
+        }
+
+        @keyframes tear-right {
+            0% {
+                transform: rotate(0deg) translateX(0);
+                opacity: 1;
+            }
+            100% {
+                transform: rotate(15deg) translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        .tear-left {
+            animation: tear-left 1.5s forwards;
+            transform-origin: left center;
+        }
+
+        .tear-right {
+            animation: tear-right 1.5s forwards;
+            transform-origin: right center;
+        }
+
+        .paper-edge {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .paper-edge::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 20px;
+            background: repeating-linear-gradient(
+                45deg,
+                #f5f5f5,
+                #f5f5f5 2px,
+                #e0e0e0 2px,
+                #e0e0e0 4px
+            );
+        }
+
+        .left-edge::after {
+            right: -10px;
+            transform: skewX(-10deg);
+        }
+
+        .right-edge::after {
+            left: -10px;
+            transform: skewX(-10deg);
+        }
+
+        .content {
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            transition-delay: 1s;
+        }
+
+        .show-content {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center overflow-hidden">
+    <!-- Animation de déchirure -->
+    <div id="tear-animation" class="fixed inset-0 z-50 flex">
+        <div id="left-half" class="paper-edge left-edge w-1/2 h-full bg-white flex items-center justify-end pr-10">
+            <div class="text-right">
+                <h1 class="text-4xl font-bold text-gray-800 mb-4">Bienvenue</h1>
+                <p class="text-gray-600 mb-8">Prêt à découvrir notre univers?</p>
+                <button onclick="startTearAnimation()" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-full transition-all transform hover:scale-105">
+                    Déchirer le papier
+                </button>
+            </div>
+        </div>
+        <div id="right-half" class="paper-edge right-edge w-1/2 h-full bg-white flex items-center justify-start pl-10">
+            <div>
+                <h1 class="text-4xl font-bold text-gray-800 mb-4">Sur notre site</h1>
+                <p class="text-gray-600 mb-8">Une expérience unique vous attend</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenu principal (caché au début) -->
+    <div id="main-content" class="content container mx-auto px-4 py-16 max-w-6xl">
+        <header class="mb-16 text-center">
+            <h1 class="text-5xl font-bold text-gray-800 mb-4">Notre Magnifique Site</h1>
+            <p class="text-xl text-gray-600">Découvrez ce que nous avons préparé pour vous</p>
+        </header>
+
+        <div class="grid md:grid-cols-3 gap-8 mb-16">
+            <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+                <div class="text-blue-500 text-4xl mb-4">🌟</div>
+                <h3 class="text-xl font-semibold mb-2">Fonctionnalité 1</h3>
+                <p class="text-gray-600">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+                <div class="text-blue-500 text-4xl mb-4">🚀</div>
+                <h3 class="text-xl font-semibold mb-2">Fonctionnalité 2</h3>
+                <p class="text-gray-600">Vivamus luctus eros aliquet convallis ultricies. Mauris augue massa.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+                <div class="text-blue-500 text-4xl mb-4">🎯</div>
+                <h3 class="text-xl font-semibold mb-2">Fonctionnalité 3</h3>
+                <p class="text-gray-600">Sed ornare dictum mi, sed rutrum metus condimentum sodales.</p>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div class="md:flex">
+                <div class="md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-4">Notre Mission</h2>
+                    <p class="text-gray-600 mb-6">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor.</p>
+                    <button class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-full self-start transition-all transform hover:scale-105">
+                        En savoir plus
+                    </button>
+                </div>
+                <div class="md:w-1/2">
+                    <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-1.2.1&auto=format&fit=crop&w=1352&q=80" alt="Mission" class="w-full h-full object-cover">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function startTearAnimation() {
+            const leftHalf = document.getElementById('left-half');
+            const rightHalf = document.getElementById('right-half');
+            const tearAnimation = document.getElementById('tear-animation');
+            const mainContent = document.getElementById('main-content');
+            
+            // Appliquer les animations de déchirure
+            leftHalf.classList.add('tear-left');
+            rightHalf.classList.add('tear-right');
+            
+            // Après l'animation, afficher le contenu principal et supprimer l'animation
+            setTimeout(() => {
+                mainContent.classList.add('show-content');
+                tearAnimation.style.display = 'none';
+            }, 1500);
+        }
+
+        // Optionnel: Déclencher automatiquement après un délai
+        // setTimeout(startTearAnimation, 3000);
+    </script>
+</body>
+</html>

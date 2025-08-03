@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Client API Optimisé</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f3ecdb;
+            color: #2B2B2B;
+        }
+        h1 { 
+            color: #7A65BF; 
+            border-bottom: 2px solid #7A65BF;
+            padding-bottom: 10px;
+        }
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #7A65BF;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #65539e;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Client API Optimisé</h1>
+    
+    <div class="card">
+        <h2>Configuration</h2>
+        <div>
+            <label for="api-url">URL API:</label>
+            <input type="text" id="api-url" value="https://script.google.com/macros/s/AKfycbx0zKqsYLEH-7h66UmOGA6dn2sJxziFR_YKhI3I1PkESOEeM4CudZ4h2eIUola6u7VjKg/exec">
+        </div>
+    </div>
+    
+    <div class="card">
+        <h2>Test GET - Vérification de santé</h2>
+        <button id="test-get">Tester GET (fetch)</button>
+        <button id="test-get-form">Tester GET (formulaire)</button>
+        <pre id="get-result">En attente...</pre>
+        <form id="get-form" method="GET" target="response-frame" style="display:none;"></form>
+        <iframe id="response-frame" name="response-frame" style="width:100%; height:100px; border:1px solid #ddd; margin-top:10px; display:none;"></iframe>
+    </div>
+    
+    <div class="card">
+        <h2>Test POST - Inscription</h2>
+        <div>
+            <label for="firstName">Prénom:</label>
+            <input type="text" id="firstName" value="Test">
+        </div>
+        <div>
+            <label for="lastName">Nom:</label>
+            <input type="text" id="lastName" value="Utilisateur">
+        </div>
+        <div>
+            <label for="email">Email:</label>
+            <input type="email" id="email" value="test@example.com">
+        </div>
+        
+        <div style="margin-bottom:10px;">
+            <button id="test-post">Envoyer l'inscription (fetch)</button>
+            <button id="test-post-form">Envoyer l'inscription (formulaire)</button>
+        </div>
+        
+        <pre id="post-result">En attente...</pre>
+        <form id="post-form" method="POST" target="post-response-frame" style="display:none;">
+            <input type="hidden" name="secretKey" value="AIzaSyBTx30LCTda0WYkfEJ-k2-rahNGkFMggJ0">
+            <input type="hidden" name="firstName" id="form-firstName">
+            <input type="hidden" name="lastName" id="form-lastName">
+            <input type="hidden" name="email" id="form-email">
+        </form>
+        <iframe id="post-response-frame" name="post-response-frame" style="width:100%; height:100px; border:1px solid #ddd; margin-top:10px; display:none;"></iframe>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Récupération des éléments
+            const apiUrlInput = document.getElementById('api-url');
+            const getButton = document.getElementById('test-get');
+            const postButton = document.getElementById('test-post');
+            const getResult = document.getElementById('get-result');
+            const postResult = document.getElementById('post-result');
+            
+            // Test GET via fetch
+            getButton.addEventListener('click', function() {
+                getResult.textContent = 'Chargement...';
+                getResult.className = '';
+                document.getElementById('response-frame').style.display = 'none';
+                
+                const apiUrl = apiUrlInput.value;
+                
+                fetch(apiUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        getResult.textContent = JSON.stringify(data, null, 2);
+                        // Accepter plusieurs formats de réponse (status:up ou ts:timestamp)
+                        getResult.className = (data.status === 'up' || data.ts) ? 'success' : 'error';
+                    })
+                    .catch(error => {
+                        getResult.textContent = 'Erreur: ' + error.message;
+                        getResult.className = 'error';
+                    });
+            });
+            
+            // Test GET via formulaire HTML (contourne CORS)
+            document.getElementById('test-get-form').addEventListener('click', function() {
+                getResult.textContent = 'Chargement via formulaire...';
+                document.getElementById('response-frame').style.display = 'block';
+                
+                const form = document.getElementById('get-form');
+                form.action = apiUrlInput.value;
+                form.submit();
+            });
+            
+            // Test POST via fetch
+            postButton.addEventListener('click', function() {
+                postResult.textContent = 'Envoi en cours...';
+                postResult.className = '';
+                document.getElementById('post-response-frame').style.display = 'none';
+                
+                const apiUrl = apiUrlInput.value;
+                const firstName = document.getElementById('firstName').value;
+                const lastName = document.getElementById('lastName').value;
+                const email = document.getElementById('email').value;
+                
+                // Préparation des données selon le format attendu par l'API
+                const data = {
+                    secretKey: 'AIzaSyBTx30LCTda0WYkfEJ-k2-rahNGkFMggJ0',
+                    firstName: firstName,
+                    lastName: lastName,
+                    email: email
+                };
+                
+                fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        postResult.textContent = JSON.stringify(data, null, 2);
+                        postResult.className = data.ok ? 'success' : 'error';
+                    })
+                    .catch(error => {
+                        postResult.textContent = 'Erreur: ' + error.message;
+                        postResult.className = 'error';
+                    });
+            });
+            
+            // Test POST via formulaire HTML (contourne CORS)
+            document.getElementById('test-post-form').addEventListener('click', function() {
+                postResult.textContent = 'Envoi via formulaire...';
+                document.getElementById('post-response-frame').style.display = 'block';
+                
+                // Mise à jour des champs cachés du formulaire
+                document.getElementById('form-firstName').value = document.getElementById('firstName').value;
+                document.getElementById('form-lastName').value = document.getElementById('lastName').value;
+                document.getElementById('form-email').value = document.getElementById('email').value;
+                
+                // Soumission du formulaire
+                const form = document.getElementById('post-form');
+                form.action = apiUrlInput.value;
+                form.submit();
+            });
+        });
+    </script>
+</body>
+</html>
