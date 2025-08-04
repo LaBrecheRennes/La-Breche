@@ -691,26 +691,23 @@ function initializePopup() {
  * @returns {Promise<boolean>} - true si succès, false sinon
  */
 async function submitRegistrationToGoogleSheets(circleName, firstName, lastName, email) {
-    // URL du Google Apps Script déployé - Mise à jour 2025-08-03
-    const appsScriptUrl = 'https://script.google.com/macros/s/AKfycbw2z9eLYlfC-asXs95gbqMDgXDM7k8yNnXzfk1uV3u_Vlkoe09btvdGtEcaOgBMU0D1hw/exec';
+    // URL du Google Apps Script déployé
+    const appsScriptUrl = 'https://script.google.com/macros/s/AKfycbyJwAt6eyzH_2OJL16OfVGTl6Bjm6sxz_BKf_0frsGWi4NT0SsLiuYOHqtGquDi8isEMA/exec';
     
     console.log('URL Google Apps Script utilisée:', appsScriptUrl);
-    
-    console.log(`Tentative d'inscription pour ${firstName} ${lastName} dans le cercle "${circleName}"`);
+    console.log(`Tentative d'inscription pour ${firstName} ${lastName} (${email}) dans l'onglet: ${circleName}`);
     
     try {
+        // Créer les données du formulaire
+        const formData = new FormData();
+        formData.append('Name', firstName);
+        formData.append('LastName', lastName);
+        formData.append('Email', email);
+        formData.append('SheetName', circleName); // Ajouter le nom de l'onglet
+        
         const response = await fetch(appsScriptUrl, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                secretKey: 'la-breche-2025-inscription',
-                circleName: circleName,
-                firstName: firstName,
-                lastName: lastName,
-                email: email
-            })
+            body: formData
         });
         
         if (!response.ok) {
@@ -721,11 +718,11 @@ async function submitRegistrationToGoogleSheets(circleName, firstName, lastName,
         const result = await response.json();
         console.log('Réponse du serveur:', result);
         
-        if (result.success) {
-            console.log('Inscription réussie:', result.message);
+        if (result.result === 'success') {
+            console.log('Inscription réussie! Ligne ajoutée:', result.row);
             return true;
         } else {
-            console.error('Erreur d\'inscription:', result.message);
+            console.error('Erreur d\'inscription:', result.error || result);
             return false;
         }
         
@@ -825,11 +822,15 @@ function initializeForm() {
                         }
                     
                     // Cacher le formulaire et afficher le message de succès
-                    document.getElementById('popup-form-container').style.display = 'none';
-                    document.getElementById('popup-success-message').style.display = 'block';
+                    const popupForm = document.getElementById('popup-registration-form');
+                    const successMessage = document.getElementById('popup-success-message');
+                    const messagesContainer = document.getElementById('popup-messages-container');
+                    
+                    if (popupForm) popupForm.style.display = 'none';
+                    if (messagesContainer) messagesContainer.style.display = 'block';
+                    if (successMessage) successMessage.style.display = 'block';
                     
                     // Ajouter un bouton pour fermer le popup après l'inscription
-                    const successMessage = document.getElementById('popup-success-message');
                     if (successMessage) {
                         // Créer le bouton de fermeture s'il n'existe pas déjà
                         let closeBtn = document.getElementById('popup-close-after-success');
@@ -852,8 +853,8 @@ function initializeForm() {
                     }
                 } else {
                     // Échec de l'inscription
-                    console.error('Erreur d\'inscription:', data.error);
-                    showApiError(data.error || 'Une erreur est survenue lors de l\'inscription');
+                    console.error('Échec de l\'inscription');
+                    showApiError('Une erreur est survenue lors de l\'inscription');
                 }
             })
             .catch(error => {
