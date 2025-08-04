@@ -476,9 +476,9 @@ function renderCircles() {
         return;
     }
     
-    // Créer et ajouter chaque cercle
+    // Créer et ajouter chaque cercle avec animation synchronisée
     // On utilise déjà les cercles triés (par loadCirclesData)
-    circles.forEach(cercle => {
+    circles.forEach((cercle, index) => {
         // Cloner le template
         const cercleElement = template.content.cloneNode(true);
         
@@ -526,8 +526,41 @@ function renderCircles() {
         if (inscriptionBtn) inscriptionBtn.dataset.circleId = cercle.id;
         if (listeAttenteBtn) listeAttenteBtn.dataset.circleId = cercle.id;
         
-        // Si le cercle est complet
-        if (cercle.places_disponibles <= 0) {
+        // Vérifier si l'utilisateur s'est déjà inscrit à ce cercle
+        const userRegistrations = JSON.parse(localStorage.getItem('labreche_registrations') || '{}');
+        let isAlreadyRegistered = false;
+        
+        // Parcourir tous les emails enregistrés pour voir si ce cercle est déjà pris
+        for (const email in userRegistrations) {
+            if (userRegistrations[email].includes(cercle.id)) {
+                isAlreadyRegistered = true;
+                break;
+            }
+        }
+        
+        // Si l'utilisateur s'est déjà inscrit à ce cercle
+        if (isAlreadyRegistered) {
+            // Désactiver et modifier le bouton d'inscription
+            if (inscriptionBtn) {
+                inscriptionBtn.disabled = true;
+                inscriptionBtn.classList.remove('hover:bg-[#665aa5]', 'bg-[#7A65BF]');
+                inscriptionBtn.classList.add('bg-green-500', 'cursor-not-allowed');
+                
+                const textSpan = inscriptionBtn.querySelector('.inscription-texte');
+                if (textSpan) {
+                    textSpan.textContent = 'Merci pour votre inscription !';
+                } else {
+                    inscriptionBtn.innerHTML = 'Merci pour votre inscription !';
+                }
+            }
+            
+            // Cacher le bouton liste d'attente
+            if (listeAttenteBtn) {
+                listeAttenteBtn.style.display = 'none';
+            }
+        }
+        // Si le cercle est complet ET que l'utilisateur ne s'est pas déjà inscrit
+        else if (cercle.places_disponibles <= 0) {
             // Cacher le bouton d'inscription standard
             if (inscriptionBtn) {
                 inscriptionBtn.style.display = 'none';
@@ -541,10 +574,8 @@ function renderCircles() {
                     openPopupForCircle(cercle.id, true); // true indique liste d'attente
                 });
             }
-            
-            // Le message 'cercle complet' a été supprimé, nous utilisons maintenant les icônes d'état
         } else {
-            // Cercle avec places disponibles
+            // Cercle avec places disponibles ET utilisateur pas encore inscrit
             if (inscriptionBtn) {
                 // Ajouter l'événement click pour ouvrir le popup
                 inscriptionBtn.addEventListener('click', function() {
@@ -558,8 +589,24 @@ function renderCircles() {
             }
         }
         
-        // Ajouter le cercle au conteneur
+        // Ajouter le cercle au conteneur avec animation synchronisée
+        const cercleDiv = cercleElement.querySelector('.cercle-item');
+        if (cercleDiv) {
+            // Initialiser l'opacité à 0 et décaler vers le bas
+            cercleDiv.style.opacity = '0';
+            cercleDiv.style.transform = 'translateY(30px)';
+            cercleDiv.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        }
+        
         container.appendChild(cercleElement);
+        
+        // Animer l'apparition avec un délai progressif
+        setTimeout(() => {
+            if (cercleDiv) {
+                cercleDiv.style.opacity = '1';
+                cercleDiv.style.transform = 'translateY(0)';
+            }
+        }, index * 150); // Délai de 150ms entre chaque cercle
     });
 }
 
@@ -575,6 +622,9 @@ function openPopupForCircle(circleId, isWaitingList = false) {
     
     const popupOverlay = document.getElementById('inscription-popup');
     if (!popupOverlay) return;
+    
+    // IMPORTANT: Réinitialiser complètement le formulaire avant d'ouvrir
+    resetPopupForm();
     
     // Mettre à jour le titre du popup avec le nom du cercle et le statut de liste d'attente si applicable
     const popupTitle = popupOverlay.querySelector('.popup-title');
@@ -812,6 +862,12 @@ function initializeForm() {
                         // Inscription réussie
                         console.log('Inscription réussie dans Google Sheets');
                         
+                        // Marquer ce cercle comme inscrit dans le localStorage
+                        markCircleAsRegistered(circleId, email);
+                        
+                        // Désactiver le bouton d'inscription pour ce cercle
+                        disableCircleButton(circleId);
+                        
                         // Mettre à jour le nombre de places disponibles
                         updateCircleDisplay(circleId, true);
                         
@@ -901,24 +957,38 @@ function resetPopupForm() {
     // Réinitialiser les champs
     popupForm.reset();
     
-    // Cacher les messages d'erreur
+    // Cacher tous les messages d'erreur
     document.querySelectorAll('.popup-error').forEach(err => {
         err.style.display = 'none';
     });
     
-    // Afficher le formulaire et cacher le message de succès
-    if (document.getElementById('popup-form-container')) {
-        document.getElementById('popup-form-container').style.display = 'block';
-    }
-    if (document.getElementById('popup-success-message')) {
-        document.getElementById('popup-success-message').style.display = 'none';
+    // Cacher les messages d'erreur d'API
+    const apiErrorElement = document.getElementById('popup-api-error');
+    if (apiErrorElement) {
+        apiErrorElement.style.display = 'none';
     }
     
     // Réinitialiser le bouton de soumission
     const submitBtn = document.getElementById('popup-submit-btn');
     if (submitBtn) {
         submitBtn.disabled = false;
-        submitBtn.innerHTML = 'Confirmer mon inscription';
+        submitBtn.innerHTML = "S'inscrire";
+    }
+    
+    // Afficher le formulaire et cacher le message de succès
+    const formContainer = document.getElementById('popup-form-container');
+    const successMessage = document.getElementById('popup-success-message');
+    const messagesContainer = document.getElementById('popup-messages-container');
+    
+    if (formContainer) formContainer.style.display = 'block';
+    if (popupForm) popupForm.style.display = 'block';
+    if (successMessage) successMessage.style.display = 'none';
+    if (messagesContainer) messagesContainer.style.display = 'none';
+    
+    // Supprimer le bouton de fermeture s'il existe
+    const closeBtn = document.getElementById('popup-close-after-success');
+    if (closeBtn) {
+        closeBtn.remove();
     }
     
     // Réinitialiser le titre de la popup
@@ -937,8 +1007,82 @@ function resetPopupForm() {
  * @returns {boolean} - true si l'email est valide, false sinon
  */
 function validateEmail(email) {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email);
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
+/**
+ * Marque un cercle comme inscrit dans le localStorage
+ * @param {string} circleId - ID du cercle
+ * @param {string} email - Email de l'utilisateur
+ */
+function markCircleAsRegistered(circleId, email) {
+    try {
+        // Récupérer les inscriptions existantes
+        const registrations = JSON.parse(localStorage.getItem('labreche_registrations') || '{}');
+
+        // Ajouter cette inscription
+        if (!registrations[email]) {
+            registrations[email] = [];
+        }
+
+        // Vérifier si déjà inscrit (sécurité)
+        if (!registrations[email].includes(circleId)) {
+            registrations[email].push(circleId);
+            localStorage.setItem('labreche_registrations', JSON.stringify(registrations));
+            console.log(`Cercle ${circleId} marqué comme inscrit pour ${email}`);
+        }
+    } catch (error) {
+        console.error('Erreur lors de la sauvegarde de l\'inscription:', error);
+    }
+}
+
+/**
+ * Vérifie si un utilisateur est déjà inscrit à un cercle
+ * @param {string} circleId - ID du cercle
+ * @param {string} email - Email de l'utilisateur
+ * @returns {boolean} - true si déjà inscrit
+ */
+function isUserRegisteredToCircle(circleId, email) {
+    try {
+        const registrations = JSON.parse(localStorage.getItem('labreche_registrations') || '{}');
+        return registrations[email] && registrations[email].includes(circleId);
+    } catch (error) {
+        console.error('Erreur lors de la vérification de l\'inscription:', error);
+        return false;
+    }
+}
+
+/**
+ * Désactive le bouton d'inscription pour un cercle
+ * @param {string} circleId - ID du cercle
+ */
+function disableCircleButton(circleId) {
+    // Trouver tous les boutons d'inscription pour ce cercle
+    const inscriptionBtns = document.querySelectorAll(`[data-circle-id="${circleId}"]`);
+
+    inscriptionBtns.forEach(btn => {
+        if (btn.classList.contains('cercle-inscription-btn')) {
+            // Désactiver le bouton
+            btn.disabled = true;
+            btn.classList.remove('hover:bg-[#665aa5]');
+            btn.classList.add('bg-green-500', 'cursor-not-allowed');
+
+            // Changer le texte
+            const textSpan = btn.querySelector('.inscription-texte');
+            if (textSpan) {
+                textSpan.textContent = 'Merci pour votre inscription !';
+            } else {
+                btn.innerHTML = 'Merci pour votre inscription !';
+            }
+
+            // Supprimer l'événement de clic
+            btn.onclick = null;
+            btn.removeEventListener('click', btn._clickHandler);
+
+            console.log(`Bouton désactivé pour le cercle ${circleId}`);
+        }
+    });
 }
 
 /**
