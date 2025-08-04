@@ -149,6 +149,8 @@ function initializeApp() {
             initializePopup();
             // Initialiser le formulaire
             initializeForm();
+            // Initialiser le formulaire de contact
+            initializeContactForm();
         })
         .catch(error => {
             console.error('Erreur lors du chargement des cercles:', error);
@@ -1090,38 +1092,271 @@ function disableCircleButton(circleId) {
  * Cette fonction peut être adaptée pour utiliser l'API Google Sheets ou un service proxy
  */
 function loadCirclesFromGoogleSheet() {
-    // URL de l'API (à remplacer par l'URL réelle de l'API Google Sheets ou d'un service intermédiaire)
-    const apiUrl = 'https://example.com/api/google-sheets-proxy';
+    // Placeholder pour une future implémentation
+    // Cette fonction pourrait utiliser l'API Google Sheets pour charger dynamiquement
+    // les informations des cercles depuis une feuille de calcul
     
-    // Dans une implémentation réelle :
+    console.log('loadCirclesFromGoogleSheet: Fonction non implémentée');
+    
+    // Exemple de structure de retour attendue :
     /*
-    return fetch(apiUrl)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Erreur lors de la récupération des données');
-            }
-            return response.json();
-        })
-        .then(data => {
-            // Transformer les données du format Google Sheets vers notre format de cercles
-            return data.values.map((row, index) => {
-                if (index === 0) return null; // Ignorer l'en-tête
-                
-                return {
-                    id: row[0] || `cercle-${index}`,
-                    nom: row[1] || 'Cercle sans nom',
-                    date: row[2] || 'Date non précisée',
-                    lieu: row[3] || 'Lieu non précisé',
-                    referentes: row[4] || 'Référentes non précisées',
-                    description: row[5] || 'Pas de description disponible',
-                    places_disponibles: parseInt(row[6], 10) || 0,
-                    places_totales: parseInt(row[7], 10) || 0
-                };
-            }).filter(item => item !== null); // Filtrer l'en-tête
-        });
+    return [
+        {
+            id: 'cercle-1',
+            nom: 'Masculinités et émotions',
+            date: '15 septembre 2024',
+            heure: '14h00 - 16h00',
+            lieu: 'CRIDEV, Rennes',
+            description: 'Explorer la relation entre masculinité et expression émotionnelle.',
+            places_disponibles: 8,
+            places_totales: 12,
+            animateur: 'Équipe La Brèche',
+            thematique: 'Émotions et vulnérabilité',
+            prerequis: 'Aucun prérequis',
+            materiel: 'Aucun matériel nécessaire'
+        },
+        // ... autres cercles
+    ];
     */
     
-    // Pour le moment, on utilise des données simulées
-    console.log('Chargement des cercles depuis Google Sheet - simulation');
-    return loadCirclesData(); // Utilise notre fonction de simulation pour l'instant
+    // Pour l'instant, retourner un tableau vide
+    return [];
+}
+
+// ===== FORMULAIRE DE CONTACT =====
+
+/**
+ * Ouvre la pop-up de contact
+ */
+function openContactPopup() {
+    const contactPopup = document.getElementById('contact-popup');
+    if (contactPopup) {
+        resetContactPopupForm();
+        contactPopup.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+/**
+ * Ferme la pop-up de contact
+ */
+function closeContactPopup() {
+    const contactPopup = document.getElementById('contact-popup');
+    if (contactPopup) {
+        contactPopup.classList.remove('active');
+        document.body.style.overflow = 'auto';
+    }
+}
+
+/**
+ * Initialise le formulaire de contact
+ */
+function initializeContactForm() {
+    const contactForm = document.getElementById('contact-popup-form');
+    if (!contactForm) return;
+    
+    contactForm.addEventListener('submit', handleContactFormSubmit);
+    
+    // Gestionnaires pour fermer la pop-up
+    const closeBtn = document.getElementById('close-contact-popup');
+    const closeBtns = document.querySelectorAll('.contact-popup-close-btn');
+    
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closeContactPopup);
+    }
+    
+    closeBtns.forEach(btn => {
+        btn.addEventListener('click', closeContactPopup);
+    });
+    
+    // Fermer en cliquant sur l'overlay
+    const contactPopup = document.getElementById('contact-popup');
+    if (contactPopup) {
+        contactPopup.addEventListener('click', function(e) {
+            if (e.target === contactPopup) {
+                closeContactPopup();
+            }
+        });
+    }
+}
+
+/**
+ * Gère la soumission du formulaire de contact
+ * @param {Event} event - L'événement de soumission du formulaire
+ */
+async function handleContactFormSubmit(event) {
+    event.preventDefault();
+    
+    const form = event.target;
+    const submitBtn = document.getElementById('contact-popup-submit-btn');
+    const submitText = document.getElementById('contact-popup-submit-text');
+    const loading = document.getElementById('contact-popup-loading');
+    const successContent = document.getElementById('contact-popup-success-content');
+    const successMessage = document.getElementById('contact-popup-success-message');
+    const errorMessage = document.getElementById('contact-popup-error-message');
+    
+    // Récupérer les données du formulaire
+    const formData = {
+        name: form.name.value.trim(),
+        email: form.email.value.trim(),
+        subject: form.subject.value,
+        message: form.message.value.trim()
+    };
+    
+    // Validation basique
+    if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+        showContactError('Veuillez remplir tous les champs.');
+        return;
+    }
+    
+    if (!validateEmail(formData.email)) {
+        showContactError('Veuillez entrer une adresse email valide.');
+        return;
+    }
+    
+    // Masquer les messages précédents
+    if (successMessage) successMessage.classList.add('hidden');
+    if (errorMessage) errorMessage.classList.add('hidden');
+    if (successContent) successContent.style.display = 'none';
+    form.style.display = 'block';
+    
+    // Afficher l'état de chargement
+    submitBtn.disabled = true;
+    submitText.textContent = 'Envoi en cours...';
+    loading.classList.remove('hidden');
+    
+    try {
+        // Envoyer le message via EmailJS ou un service similaire
+        const success = await sendContactEmail(formData);
+        
+        if (success) {
+            // Succès
+            form.reset();
+            form.style.display = 'none';
+            if (successContent) {
+                successContent.style.display = 'block';
+            }
+        } else {
+            throw new Error('Échec de l\'envoi');
+        }
+    } catch (error) {
+        console.error('Erreur lors de l\'envoi du message de contact:', error);
+        showContactError('Une erreur est survenue lors de l\'envoi. Veuillez réessayer.');
+    } finally {
+        // Restaurer l'état du bouton
+        submitBtn.disabled = false;
+        submitText.textContent = 'Envoyer le message';
+        loading.classList.add('hidden');
+    }
+}
+
+/**
+ * Envoie un email de contact via un service externe
+ * @param {Object} formData - Les données du formulaire
+ * @returns {Promise<boolean>} - true si succès, false sinon
+ */
+async function sendContactEmail(formData) {
+    // Pour l'instant, nous allons utiliser un service simple comme formspree.io
+    // ou créer un script Google Apps Script pour envoyer l'email
+    
+    // URL du script Google Apps Script pour l'envoi d'emails
+    // Vous devrez créer ce script et remplacer cette URL
+    const CONTACT_SCRIPT_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
+    
+    try {
+        // Préparer les données à envoyer
+        const payload = {
+            to: 'labreche.rennes@gmail.com',
+            subject: `[Site La Brèche] ${formData.subject}`,
+            name: formData.name,
+            email: formData.email,
+            message: formData.message,
+            timestamp: new Date().toISOString()
+        };
+        
+        // Pour l'instant, simuler un envoi réussi
+        // Dans une vraie implémentation, vous feriez :
+        /*
+        const response = await fetch(CONTACT_SCRIPT_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload)
+        });
+        
+        return response.ok;
+        */
+        
+        // Simulation d'un délai d'envoi
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        // Pour les tests, toujours retourner true
+        // En production, vous devrez implémenter l'envoi réel
+        console.log('Message de contact à envoyer:', payload);
+        return true;
+        
+    } catch (error) {
+        console.error('Erreur lors de l\'envoi du message de contact:', error);
+        return false;
+    }
+}
+
+/**
+ * Réinitialise le formulaire de contact de la pop-up
+ */
+function resetContactPopupForm() {
+    const form = document.getElementById('contact-popup-form');
+    const successContent = document.getElementById('contact-popup-success-content');
+    const successMessage = document.getElementById('contact-popup-success-message');
+    const errorMessage = document.getElementById('contact-popup-error-message');
+    const submitBtn = document.getElementById('contact-popup-submit-btn');
+    const submitText = document.getElementById('contact-popup-submit-text');
+    const loading = document.getElementById('contact-popup-loading');
+    
+    if (form) {
+        form.reset();
+        form.style.display = 'block';
+    }
+    
+    if (successContent) successContent.style.display = 'none';
+    if (successMessage) successMessage.style.display = 'none';
+    if (errorMessage) errorMessage.style.display = 'none';
+    
+    if (submitBtn) {
+        submitBtn.disabled = false;
+    }
+    if (submitText) {
+        submitText.textContent = 'Envoyer le message';
+    }
+    if (loading) {
+        loading.classList.add('hidden');
+    }
+}
+
+/**
+ * Affiche un message d'erreur pour le formulaire de contact
+ * @param {string} message - Le message d'erreur à afficher
+ */
+function showContactError(message) {
+    const errorMessage = document.getElementById('contact-popup-error-message');
+    const successMessage = document.getElementById('contact-popup-success-message');
+    const successContent = document.getElementById('contact-popup-success-content');
+    
+    if (successMessage) successMessage.style.display = 'none';
+    if (successContent) successContent.style.display = 'none';
+    if (errorMessage) {
+        errorMessage.style.display = 'block';
+        
+        // Mettre à jour le message si nécessaire
+        if (message) {
+            const textContent = errorMessage.textContent;
+            if (textContent.includes('Une erreur est survenue')) {
+                errorMessage.innerHTML = errorMessage.innerHTML.replace(
+                    /Une erreur est survenue\..*/,
+                    message
+                );
+            }
+        }
+    }
 }

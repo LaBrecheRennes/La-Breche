@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cartes en demi-cercle</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .card-container {
+            perspective: 1000px;
+        }
+        .card {
+            transition: transform 0.3s ease, z-index 0.3s ease;
+            transform-origin: bottom center;
+        }
+        .card {
+            color: rgba(255,255,255,0.8) !important;
+            text-shadow: 0 0 2px rgba(0,0,0,0.5);
+        }
+        .card:hover {
+            transform: translateY(-20px) rotate(0deg) !important;
+            z-index: 10 !important;
+            opacity: 1 !important;
+            color: white !important;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+    <div class="relative w-full max-w-lg h-48">
+        <!-- Container pour les cartes en quart de cercle -->
+        <div class="card-container absolute inset-0 flex items-end justify-start">
+            <!-- Carte 1 -->
+            <div class="card absolute bg-blue-500 text-white w-24 h-36 rounded-lg shadow-lg flex items-center justify-center text-lg font-bold transform rotate-[-30deg] translate-y-10 z-1" style="left: 10%; opacity: 0.4;">
+                Lib
+            </div>
+            
+            <!-- Carte 2 -->
+            <div class="card absolute bg-green-500 text-white w-24 h-36 rounded-lg shadow-lg flex items-center justify-center text-lg font-bold transform rotate-[-20deg] translate-y-6 z-2" style="left: 20%; opacity: 0.5;">
+                Joi
+            </div>
+            
+            <!-- Carte 3 -->
+            <div class="card absolute bg-yellow-500 text-white w-24 h-36 rounded-lg shadow-lg flex items-center justify-center text-lg font-bold transform rotate-[-10deg] translate-y-2 z-3" style="left: 30%; opacity: 0.6;">
+                Px
+            </div>
+            
+            <!-- Carte 4 -->
+            <div class="card absolute bg-red-500 text-white w-24 h-36 rounded-lg shadow-lg flex items-center justify-center text-lg font-bold transform rotate-0 translate-y-0 z-7" style="left: 40%; opacity: 1;">
+                New
+            </div>
+            
+            <!-- Carte 5 -->
+            <div class="card absolute bg-purple-500 text-white w-24 h-36 rounded-lg shadow-lg flex items-center justify-center text-lg font-bold transform rotate-[10deg] translate-y-2 z-4" style="left: 50%; opacity: 0.7;">
+                Am
+            </div>
+            
+            <!-- Carte 6 -->
+            <div class="card absolute bg-pink-500 text-white w-24 h-36 rounded-lg shadow-lg flex items-center justify-center text-lg font-bold transform rotate-[20deg] translate-y-6 z-5" style="left: 60%; opacity: 0.8;">
+                Esp
+            </div>
+            
+            <!-- Carte 7 -->
+            <div class="card absolute bg-indigo-500 text-white w-24 h-36 rounded-lg shadow-lg flex items-center justify-center text-lg font-bold transform rotate-[30deg] translate-y-10 z-6" style="left: 70%; opacity: 0.9;">
+                Cré
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Animation supplémentaire pour améliorer l'effet
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.classList.add('shadow-xl');
+            });
+            card.addEventListener('mouseleave', () => {
+                card.classList.remove('shadow-xl');
+            });
+        });
+    </script>
+</body>
+</html>
