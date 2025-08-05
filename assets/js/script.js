@@ -36,6 +36,20 @@ function animateFonctionnementBackground() {
     animateBackgroundImage('fonctionnement-bg-image');
 }
 
+// Variables pour l'animation d'impact supprimées
+
+// Fonction createScreenShake supprimée
+
+// Fonction createImpactAnimation supprimée
+
+// Fonction clearAllImpacts supprimée
+
+// Variables pour l'animation d'empilement anxiogène - SUPPRIMÉES
+
+// Fonction createStackingPhrase supprimée
+
+// Fonction stopStackingPhrases supprimée
+
 // Fonction d'initialisation de l'application
 document.addEventListener('DOMContentLoaded', function() {
     // Initialisation du reste de l'application
@@ -44,6 +58,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Animation progressive des images de fond
     animateHeroBackground();
     animateFonctionnementBackground();
+    
+    // Événement de clic pour l'animation d'impact supprimé
+    
+    // Animation d'empilement anxiogène supprimée
     
     // S'assurer que l'animation est prête
     const tearAnimation = document.getElementById('tear-animation');
@@ -84,9 +102,89 @@ function initScrollAnimations() {
 }
 
 /**
- * Démarre l'animation de déchirure et révèle le contenu
+ * Animation de révélation de la brèche (approche CSS pure inspirée de test_cartes.html)
  */
-function startTearAnimation() {
+function startBreachRevealAnimation() {
+    const breachReveal = document.getElementById('breach-reveal');
+    const breachImage = document.getElementById('breach-image');
+    
+    if (!breachReveal || !breachImage) {
+        console.log('Elements de brèche non trouvés, passage à l\'animation classique');
+        continueWithTearAnimation();
+        return;
+    }
+    
+    console.log('Démarrage de l\'animation de révélation de la brèche (CSS)');
+    
+    // DIAGNOSTIC : Vérifier l'état avant nettoyage
+    console.log('Avant nettoyage - inline style :', breachImage.getAttribute('style'));
+    console.log('Avant nettoyage - computed clipPath :', getComputedStyle(breachImage).clipPath);
+    
+    // NETTOYAGE ROBUSTE : Supprimer tout style inline qui pourrait bloquer
+    breachImage.style.clipPath = '';
+    breachImage.style.webkitClipPath = '';
+    breachImage.removeAttribute('style');
+    
+    // DIAGNOSTIC : Vérifier l'état après nettoyage
+    console.log('Après nettoyage - inline style :', breachImage.getAttribute('style'));
+    console.log('Après nettoyage - computed clipPath :', getComputedStyle(breachImage).clipPath);
+    
+    // Déclencher l'animation CSS (inspirée de test_cartes.html)
+    breachImage.classList.add('breach-reveal-animation');
+    
+    // DIAGNOSTIC : Vérifier que l'animation se lance
+    setTimeout(() => {
+        console.log('Animation en cours - animationName :', getComputedStyle(breachImage).animationName);
+        console.log('Animation en cours - clipPath :', getComputedStyle(breachImage).clipPath);
+    }, 100);
+    
+    // Après 2.5 secondes (durée de l'animation CSS), masquer les éléments et continuer
+    setTimeout(() => {
+        hideElementsAndContinue();
+    }, 3000); // 2.5s animation + 500ms pause
+}
+
+/**
+ * Masque les éléments après la révélation de la brèche et continue l'animation
+ */
+function hideElementsAndContinue() {
+    console.log('Brèche complètement révélée, masquage des éléments...');
+    
+    // Masquer la div de texte/bouton
+    const textOverlay = document.getElementById('text-overlay');
+    if (textOverlay) {
+        textOverlay.style.zIndex = '-9999';
+        textOverlay.style.opacity = '0';
+        textOverlay.style.transition = 'opacity 0.3s ease-out';
+    }
+
+    // Désactiver l'animation d'impact
+    impactAnimationActive = false;
+
+    // Supprimer toutes les images d'impact affichées
+    clearAllImpacts();
+
+    // Arrêter les phrases empilées
+    stopStackingPhrases();
+    
+    // Continuer avec l'ouverture de l'écran
+    setTimeout(() => {
+        openScreenAlongBreach();
+    }, 300);
+}
+
+/**
+ * Ouvre l'écran en deux en suivant la brèche
+ */
+function openScreenAlongBreach() {
+    console.log('Ouverture de l\'ecran en suivant la brèche');
+    continueWithTearAnimation();
+}
+
+/**
+ * Continue avec l'animation de déchirure classique
+ */
+function continueWithTearAnimation() {
     const leftHalf = document.getElementById('left-half');
     const rightHalf = document.getElementById('right-half');
     const tearAnimation = document.getElementById('tear-animation');
@@ -94,7 +192,7 @@ function startTearAnimation() {
     const mainContent = document.querySelectorAll('.content');
     const heroWave = document.getElementById('hero-wave');
     
-    console.log('Animation de déchirure démarrée');
+    console.log('Animation de déchirure démarrée - Images d\'impact et phrases supprimées');
     
     // Faire disparaître progressivement le logo central
     if (logoCenter) {
@@ -108,16 +206,38 @@ function startTearAnimation() {
     
     // Après l'animation, afficher le contenu principal et supprimer l'animation
     setTimeout(() => {
-        mainContent.forEach(element => {
+        console.log('DIAGNOSTIC - Nombre d\'éléments .content trouvés :', mainContent.length);
+        
+        mainContent.forEach((element, index) => {
             element.classList.add('show-content');
+            console.log(`DIAGNOSTIC - Élément ${index} - classes après ajout :`, element.className);
+            console.log(`DIAGNOSTIC - Élément ${index} - opacity computed :`, getComputedStyle(element).opacity);
         });
+        
+        // Masquer l'animation de déchirure
         tearAnimation.style.display = 'none';
+        console.log('DIAGNOSTIC - Animation de déchirure masquée');
+        
+        // Vérification finale
+        setTimeout(() => {
+            const showContentElements = document.querySelectorAll('.show-content');
+            console.log('DIAGNOSTIC FINAL - Nombre d\'éléments .show-content :', showContentElements.length);
+            console.log('DIAGNOSTIC FINAL - Display de tear-animation :', getComputedStyle(tearAnimation).display);
+        }, 100);
         
         // Activer l'animation de la vague Hero SVG
         if (heroWave) {
             heroWave.classList.add('animate');
         }
     }, 1500);
+}
+
+/**
+ * Démarre l'animation de déchirure et révèle le contenu
+ */
+function startTearAnimation() {
+    // PREMIÈRE ACTION : Démarrer immédiatement l'animation de révélation de la brèche
+    startBreachRevealAnimation();
 }
 
 /**

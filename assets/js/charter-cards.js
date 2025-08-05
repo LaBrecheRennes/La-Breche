@@ -85,33 +85,17 @@ function openCharterCard(cardType) {
         titleDiv.textContent = data.title;
         descriptionDiv.innerHTML = data.content;
         
-        // Afficher la zone de contenu avec animation
-        contentDiv.style.display = 'block';
-        
-        // Attendre que le contenu soit affiché puis scroll vers le H3 à mi-hauteur
-        setTimeout(() => {
-            const h3Element = titleDiv; // Le H3 est dans titleDiv
-            if (h3Element) {
-                const h3Top = h3Element.getBoundingClientRect().top + window.pageYOffset;
-                const windowHeight = window.innerHeight;
-                const targetPosition = h3Top - (windowHeight / 2); // H3 à mi-hauteur de l'écran
-                
-                window.scrollTo({ 
-                    top: targetPosition, 
-                    behavior: 'smooth' 
-                });
-            }
-        }, 100); // Petit délai pour s'assurer que le contenu est affiché
-        
-        // Animation d'apparition
+        // Animation d'apparition fluide sans scroll automatique
         contentDiv.style.opacity = '0';
         contentDiv.style.transform = 'translateY(20px)';
+        contentDiv.style.display = 'block';
         
-        setTimeout(() => {
-            contentDiv.style.transition = 'all 0.3s ease';
+        // Animation d'apparition plus fluide
+        requestAnimationFrame(() => {
+            contentDiv.style.transition = 'all 0.4s ease-out';
             contentDiv.style.opacity = '1';
             contentDiv.style.transform = 'translateY(0)';
-        }, 50);
+        });
     }
 }
 
@@ -157,7 +141,106 @@ function initializeCharterCards() {
     });
 }
 
+/**
+ * Initialise l'animation coverflow pour les cartes de la charte
+ */
+function initializeCharterCoverflow() {
+    const container = document.querySelector('.charter-coverflow-container');
+    const coverflowContainer = document.querySelector('.charter-coverflow-container');
+    
+    // Données des cartes avec leurs icônes
+    const charterCards = [
+        { id: 'confidentialite', title: 'CONFIDENTIALITÉ', icon: charterData.confidentialite.icon },
+        { id: 'ecoute', title: 'ÉCOUTE ACTIVE', icon: charterData.ecoute.icon },
+        { id: 'parler', title: 'PARLER EN SON "JE"', icon: charterData.parler.icon },
+        { id: 'mediatrices', title: 'RÔLE DES MÉDIATRICES', icon: charterData.mediatrices.icon },
+        { id: 'bienveillance', title: 'BIENVEILLANCE', icon: charterData.bienveillance.icon },
+        { id: 'parole', title: 'PRISE DE PAROLE', icon: charterData.parole.icon }
+    ];
+    
+    let currentIndex = 2; // Index de départ (carte centrale)
+    
+    // Hover scroll functionality supprimée sur demande de l'utilisateur
+    
+    // Create cards (copié de test_cartes avec adaptation du style)
+    charterCards.forEach((cardData, index) => {
+        const card = document.createElement('div');
+        card.className = 'charter-card absolute bg-gradient-to-br from-[#7A65BF] to-[#9B7DC7] text-white flex flex-col items-center justify-center font-bold rounded-lg shadow-lg cursor-pointer';
+        card.style.width = '140px';
+        card.style.height = '200px';
+        card.dataset.index = index;
+        card.dataset.card = cardData.id;
+        
+        card.innerHTML = `
+            <div class="card-icon mb-2">${cardData.icon}</div>
+            <div class="card-title text-xs text-center px-2">${cardData.title}</div>
+        `;
+        
+        // Initial positioning
+        updateCardPosition(card, index);
+        
+        card.addEventListener('click', () => {
+            currentIndex = index;
+            updateCards();
+            openCharterCard(cardData.id);
+        });
+        
+        container.appendChild(card);
+    });
+    
+    // Position cards function (copié exactement de test_cartes)
+    function updateCardPosition(card, index) {
+        const distance = index - currentIndex;
+        const absDistance = Math.abs(distance);
+        
+        // Calculate rotation and translation (valeurs exactes de test_cartes)
+        let rotateY = distance * 30;
+        let translateX = distance * 100;
+        let translateZ = -absDistance * 50;
+        let opacity = 0.5;
+        
+        // Center card
+        if (distance === 0) {
+            rotateY = 0;
+            translateX = 0;
+            translateZ = 0;
+            opacity = 1;
+        }
+        
+        // Apply styles
+        card.style.transform = `translateX(${translateX}px) translateZ(${translateZ}px) rotateY(${rotateY}deg)`;
+        card.style.opacity = opacity;
+        card.style.zIndex = 6 - absDistance;
+        
+        // Scale effect (identique à test_cartes)
+        const scale = 1 - (absDistance * 0.1);
+        card.style.transform += ` scale(${scale})`;
+    }
+    
+    // Update all cards (copié de test_cartes)
+    function updateCards() {
+        document.querySelectorAll('.charter-card').forEach((card, index) => {
+            updateCardPosition(card, index);
+        });
+    }
+    
+    // Navigation buttons (copié de test_cartes)
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft') {
+            currentIndex = (currentIndex - 1 + charterCards.length) % charterCards.length;
+            updateCards();
+        } else if (e.key === 'ArrowRight') {
+            currentIndex = (currentIndex + 1) % charterCards.length;
+            updateCards();
+        }
+    });
+    
+    // Initialize (copié de test_cartes)
+    updateCards();
+}
+
 // Initialiser les cartes de la charte quand le DOM est chargé
 document.addEventListener('DOMContentLoaded', function() {
     initializeCharterCards();
+    initializeCharterCoverflow();
 });
