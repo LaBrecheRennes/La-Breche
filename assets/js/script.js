@@ -52,6 +52,16 @@ function animateFonctionnementBackground() {
 
 // Fonction d'initialisation de l'application
 document.addEventListener('DOMContentLoaded', function() {
+    initializePopup();
+    initializeForm();
+    initializeContactForm();
+    loadCirclesFromGoogleSheet();
+    
+    // Initialiser l'intégration calendrier si disponible
+    if (typeof initializeCalendarIntegration === 'function') {
+        initializeCalendarIntegration();
+    }
+    
     // Initialisation du reste de l'application
     initializeApp();
     
@@ -1006,35 +1016,119 @@ function initializeForm() {
                     
                     if (popupForm) popupForm.style.display = 'none';
                     if (messagesContainer) messagesContainer.style.display = 'block';
-                    if (successMessage) successMessage.style.display = 'block';
+                    if (successMessage) {
+                        successMessage.style.display = 'block';
+                        
+                        // Mettre à jour le message avec les données du cercle
+                        const circleDate = circle.date || circle.dateText || 'date à confirmer';
+                        successMessage.innerHTML = `
+                            <div class="text-center">
+                                <svg class="mx-auto h-12 w-12 text-green-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                <h3 class="text-lg font-semibold text-green-800 mb-2">Inscription confirmée !</h3>
+                                <p class="text-green-700 mb-6">Merci pour votre inscription au cercle du <strong>${circleDate}</strong></p>
+                                
+                                <!-- Bouton calendrier stylisé -->
+                                <button id="popup-calendar-btn" class="cercle-calendar-btn inline-flex items-center px-6 py-3 border border-transparent text-sm font-medium rounded-lg shadow-lg text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all transform hover:scale-105">
+                                    <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+                                    </svg>
+                                    Ajouter à mon agenda
+                                </button>
+                                
+                                <p class="text-xs text-green-600 mt-3">
+                                    💡 L'événement sera ajouté à votre Google Calendar avec tous les détails
+                                </p>
+                            </div>
+                        `;
+                    }
                     
-                    // Initialiser l'intégration calendrier
+                    // Créer directement le lien Google Calendar
+                    const createGoogleCalendarLink = (circleData) => {
+                        const title = encodeURIComponent(`Cercle d'écoute - ${circleData.nom || circleData.title || 'La Brèche'}`);
+                        const location = encodeURIComponent('CRIDEV, 41 Av. Jean Janvier, 35000 Rennes');
+                        const details = encodeURIComponent(`Cercle d'écoute organisé par La Brèche.
+
+Thématique : ${circleData.nom || circleData.title || 'À définir'}
+Durée : 2 heures (accueil 15 minutes avant)
+
+Infos pratiques :
+- Participation gratuite
+- Cadre bienveillant et confidentiel
+- Médiatrices présentes pour faciliter les échanges
+
+Contact : contact@labreche.org`);
+                        
+                        // Parser la date du cercle pour créer les dates de début et fin
+                        const dateText = circleData.date || circleData.dateText || '';
+                        let startDate = '';
+                        let endDate = '';
+                        
+                        // Essayer de parser la date (format attendu: "15 octobre 2024, 18h45 - 20h45" ou similaire)
+                        const dateMatch = dateText.match(/(\d{1,2})\s+(\w+)\s+(\d{4})/);
+                        const timeMatch = dateText.match(/(\d{1,2})h(\d{2})/);
+                        
+                        if (dateMatch && timeMatch) {
+                            const day = dateMatch[1].padStart(2, '0');
+                            const monthName = dateMatch[2].toLowerCase();
+                            const year = dateMatch[3];
+                            const hour = timeMatch[1].padStart(2, '0');
+                            const minute = timeMatch[2];
+                            
+                            // Conversion des mois français
+                            const months = {
+                                'janvier': '01', 'février': '02', 'mars': '03', 'avril': '04',
+                                'mai': '05', 'juin': '06', 'juillet': '07', 'août': '08',
+                                'septembre': '09', 'octobre': '10', 'novembre': '11', 'décembre': '12'
+                            };
+                            
+                            const month = months[monthName] || '01';
+                            
+                            // Format: YYYYMMDDTHHMMSS
+                            startDate = `${year}${month}${day}T${hour}${minute}00`;
+                            
+                            // Ajouter 2 heures pour la fin
+                            let endHour = parseInt(hour) + 2;
+                            if (endHour >= 24) endHour -= 24;
+                            endDate = `${year}${month}${day}T${endHour.toString().padStart(2, '0')}${minute}00`;
+                        } else {
+                            // Date par défaut si parsing échoue
+                            const now = new Date();
+                            const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+                            const year = nextWeek.getFullYear();
+                            const month = (nextWeek.getMonth() + 1).toString().padStart(2, '0');
+                            const day = nextWeek.getDate().toString().padStart(2, '0');
+                            
+                            startDate = `${year}${month}${day}T184500`;
+                            endDate = `${year}${month}${day}T204500`;
+                        }
+                        
+                        return `https://calendar.google.com/calendar/u/0/r/eventedit?text=${title}&dates=${startDate}/${endDate}&details=${details}&location=${location}&ctz=Europe/Paris`;
+                    };
+                    
+                    // Stocker le lien Google Calendar
+                    const googleCalendarUrl = createGoogleCalendarLink(circle);
+                    
+                    // Initialiser le bouton calendrier dans la popup de succès
+                    setTimeout(() => {
+                        const calendarBtn = document.getElementById('popup-calendar-btn');
+                        if (calendarBtn) {
+                            calendarBtn.addEventListener('click', function(e) {
+                                e.preventDefault();
+                                console.log('Ouverture du lien Google Calendar:', googleCalendarUrl);
+                                window.open(googleCalendarUrl, '_blank', 'noopener');
+                            });
+                        }
+                    }, 100);
+                    
+                    // Initialiser l'intégration calendrier (ancienne méthode - garder pour compatibilité)
                     if (typeof initializeCalendarIntegration === 'function') {
                         const circleData = getSelectedCircleData();
                         initializeCalendarIntegration(circleData);
                     }
                     
-                    // Ajouter un bouton pour fermer le popup après l'inscription
-                    if (successMessage) {
-                        // Créer le bouton de fermeture s'il n'existe pas déjà
-                        let closeBtn = document.getElementById('popup-close-after-success');
-                        if (!closeBtn) {
-                            closeBtn = document.createElement('button');
-                            closeBtn.id = 'popup-close-after-success';
-                            closeBtn.className = 'bg-violet-500 hover:bg-violet-700 text-white font-bold py-2 px-4 rounded mt-4';
-                            closeBtn.textContent = 'Fermer';
-                            successMessage.appendChild(closeBtn);
-                            
-                            // Ajouter l'événement de clic pour fermer la popup complètement
-                            closeBtn.addEventListener('click', function() {
-                                const popupOverlay = document.getElementById('inscription-popup');
-                                if (popupOverlay) {
-                                    popupOverlay.classList.remove('active');
-                                    document.body.style.overflow = ''; // Réactiver le scroll
-                                }
-                            });
-                        }
-                    }
+
                 } else {
                     // Échec de l'inscription
                     console.error('Échec de l\'inscription');
@@ -1374,7 +1468,7 @@ async function handleContactFormSubmit(event) {
         console.error('Erreur lors de l\'envoi du message de contact:', error);
         showContactError('Une erreur est survenue lors de l\'envoi. Veuillez réessayer.');
     } finally {
-        // Restaurer l'état du bouton
+        // Réinitialiser l'état du bouton
         submitBtn.disabled = false;
         submitText.textContent = 'Envoyer le message';
         loading.classList.add('hidden');
@@ -1383,7 +1477,7 @@ async function handleContactFormSubmit(event) {
 
 /**
  * Envoie un email de contact via un service externe
- * @param {Object} formData - Les données du formulaire
+{{ ... }}
  * @returns {Promise<boolean>} - true si succès, false sinon
  */
 async function sendContactEmail(formData) {

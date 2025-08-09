@@ -635,14 +635,6 @@ Le cercle commencera à l'heure. Il s'ouvrira par une courte présentation.</p>
                         <button class="cercle-liste-attente-btn w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-2.5 px-4 rounded-lg transition-all flex items-center justify-center shadow-md text-sm md:text-base" style="display: none;">
                             S'inscrire sur liste d'attente
                         </button>
-                        
-                        <!-- Bouton Ajouter au calendrier -->
-                        <button class="cercle-calendar-btn w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-4 rounded-lg transition-all flex items-center justify-center shadow-md text-sm md:text-base">
-                            <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
-                            </svg>
-                            Ajouter ce cercle à mes évènements
-                        </button>
                     </div>
                 </div>
             </template>
@@ -716,21 +708,31 @@ Le cercle commencera à l'heure. Il s'ouvrira par une courte présentation.</p>
     <!-- JavaScript pour le formulaire d'inscription et la gestion des places -->
     <!-- Pop-up d'inscription -->    
     <div class="popup-overlay" id="inscription-popup">
-        <div class="popup-content">
-            <div class="popup-header">
+        <div class="popup-content max-w-md mx-auto bg-white rounded-2xl shadow-2xl overflow-hidden">
+            <div class="popup-header bg-gradient-to-r from-[#7A65BF] to-[#665aa5] text-white px-6 py-4 relative">
                 <h3 class="text-xl font-semibold">Formulaire d'inscription</h3>
-                <button class="popup-close" id="close-popup">
+                <button class="popup-close absolute top-4 right-4 text-white hover:text-gray-200 transition-colors" id="close-popup">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>
-            <div class="popup-body">
+            <div class="popup-body p-6">
                 <div class="mb-6" id="popup-messages-container" style="display: none;">
-                    <div class="p-4 mb-4 bg-green-50 border border-green-200 text-green-800 rounded-md" id="popup-success-message" style="display: none;">
+                    <div class="p-6 mb-4 bg-gradient-to-br from-green-50 to-green-100 border-l-4 border-green-400 rounded-lg shadow-sm" id="popup-success-message" style="display: none;">
                         Inscription réussie! Merci pour votre inscription.
+                        
+                        <!-- Bouton calendrier dans la div de succès -->
+                        <div class="mt-4 text-center">
+                            <button id="popup-calendar-btn" class="cercle-calendar-btn inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none transition-colors">
+                                <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+                                </svg>
+                                Ajouter ce cercle à mes évènements
+                            </button>
+                        </div>
                     </div>
-                    <div class="p-4 mb-4 bg-red-50 border border-red-200 text-red-800 rounded-md" id="popup-error-message" style="display: none;">
+                    <div class="p-4 mb-4 bg-gradient-to-br from-red-50 to-red-100 border-l-4 border-red-400 rounded-lg shadow-sm text-red-800" id="popup-error-message" style="display: none;">
                         Une erreur est survenue. Veuillez réessayer.
                     </div>
                 </div>
@@ -817,50 +819,7 @@ Le cercle commencera à l'heure. Il s'ouvrira par une courte présentation.</p>
                     </button>
                 </form>
                 
-                <!-- Message de succès après inscription -->
-                <div id="popup-success-message" class="text-center py-8 px-4" style="display: none;">
-                    <svg class="mx-auto h-12 w-12 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                    <h3 id="popup-success-title" class="mt-2 text-xl font-medium text-gray-900">Inscription confirmée</h3>
-                    <p class="mt-1 text-sm text-gray-600">
-                        Merci pour votre inscription ! Nous vous contacterons par email avec les détails pratiques.
-                    </p>
-                    
-                    <!-- Calendar Integration Section -->
-                    <div id="calendar-integration" class="mt-6 p-4 bg-gray-50 rounded-lg">
-                        <h4 class="text-lg font-medium text-gray-900 mb-3">Ajouter à votre agenda</h4>
-                        <p class="text-sm text-gray-600 mb-4">N'oubliez pas votre cercle ! Ajoutez-le directement à votre agenda personnel :</p>
-                        
-                        <div class="flex flex-col sm:flex-row gap-3 justify-center">
-                            <!-- Google Calendar Button -->
-                            <a id="google-calendar-link" href="#" target="_blank" rel="noopener" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none transition-colors">
-                                <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
-                                </svg>
-                                Google Calendar
-                            </a>
-                            
-                            <!-- Download .ics Button -->
-                            <button id="download-ics" type="button" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none transition-colors">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                </svg>
-                                Télécharger (.ics)
-                            </button>
-                        </div>
-                        
-                        <p class="text-xs text-gray-500 mt-3">
-                            Le fichier .ics fonctionne avec tous les calendriers (Apple, Outlook, etc.)
-                        </p>
-                    </div>
-                    
-                    <div class="mt-6">
-                        <button type="button" class="popup-close-btn inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary-dark focus:outline-none">
-                            Fermer
-                        </button>
-                    </div>
-                </div>
+
             </div>
         </div>
     </div>

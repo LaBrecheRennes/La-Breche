@@ -330,6 +330,63 @@ Contact : contact@labreche.org`;
         };
     }
 
+    // Variable globale pour stocker les données du cercle sélectionné
+    let selectedCercleData = null;
+
+    // Fonction pour définir les données du cercle sélectionné (appelée lors de l'inscription)
+    function setSelectedCercleData(cercleElement) {
+        if (cercleElement) {
+            selectedCercleData = extractCercleDataFromDOM(cercleElement);
+            console.log('📊 Données du cercle sélectionné sauvegardées:', selectedCercleData);
+        }
+    }
+
+    // Fonction pour gérer le bouton calendrier dans la popup de succès
+    function initPopupCalendarButton() {
+        const popupCalendarBtn = document.getElementById('popup-calendar-btn');
+        if (popupCalendarBtn && selectedCercleData) {
+            // Supprimer les anciens event listeners
+            const newBtn = popupCalendarBtn.cloneNode(true);
+            popupCalendarBtn.parentNode.replaceChild(newBtn, popupCalendarBtn);
+            
+            // Ajouter le nouvel event listener avec les bonnes données
+            newBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                console.log('🎯 Bouton calendrier popup cliqué avec données:', selectedCercleData);
+                
+                // Parser la date française
+                const parsed = parseFrenchDate(selectedCercleData.dateText);
+                if (!parsed) {
+                    console.warn('Date illisible:', selectedCercleData.dateText);
+                    alert('Date illisible. Impossible d\'ajouter l\'événement au calendrier.');
+                    return;
+                }
+                
+                // Construire l'URL Google Calendar
+                const url = buildGCalUrl({
+                    title: selectedCercleData.title,
+                    details: selectedCercleData.details,
+                    location: selectedCercleData.location,
+                    startObj: parsed,
+                    durationMinutes: 120
+                });
+                
+                console.log('🔗 Lien Google Calendar (popup):', url);
+                
+                // Ouvrir directement Google Calendar
+                window.open(url, '_blank', 'noopener');
+            });
+        }
+    }
+
+    // Exposer les fonctions globalement pour que script.js puisse les utiliser
+    window.setSelectedCercleData = setSelectedCercleData;
+    window.initPopupCalendarButton = initPopupCalendarButton;
+    window.buildGCalUrl = buildGCalUrl;
+    window.parseFrenchDate = parseFrenchDate;
+
     // Initialiser au chargement de la page
     document.addEventListener('DOMContentLoaded', initCalendarButtons);
     
