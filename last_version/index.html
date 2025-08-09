@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Brèche — Ouvrir une brèche pour mieux écouter</title>
+    <meta name="description" content="Cercles d'écoute entre hommes, avec des référentes féminines qui écoutent et cadrent si nécessaire. Cadre bienveillant, responsabilité, engagements concrets.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <style>
+        /* Améliorations responsivité mobile */
+        @media (max-width: 768px) {
+            .cercle-item {
+                min-height: 400px !important;
+                padding: 1rem !important;
+            }
+            
+            .cercle-titre {
+                font-size: 1.25rem !important;
+                margin-bottom: 1rem !important;
+            }
+            
+            .space-y-6 > * + * {
+                margin-top: 1rem !important;
+            }
+            
+            /* Animation de déchirure mobile */
+            #tear-animation {
+                flex-direction: column;
+            }
+            
+            #left-half, #right-half {
+                width: 100% !important;
+                height: 50% !important;
+                padding: 1rem !important;
+            }
+            
+            #left-half {
+                justify-content: center !important;
+                text-align: center !important;
+            }
+            
+            #right-half {
+                justify-content: center !important;
+                text-align: center !important;
+            }
+            
+            #logo-center {
+                width: 200px !important;
+                height: 200px !important;
+            }
+            
+            /* Header mobile */
+            .sticky {
+                padding: 0.5rem 1rem !important;
+            }
+            
+            /* Hero section mobile */
+            .py-24 {
+                padding-top: 3rem !important;
+                padding-bottom: 3rem !important;
+            }
+            
+            /* Grid des cercles mobile */
+            .md\:grid-cols-3 {
+                grid-template-columns: 1fr !important;
+                gap: 1rem !important;
+            }
+            
+            /* Popup mobile */
+            .popup-overlay {
+                padding: 1rem !important;
+            }
+            
+            .popup-content {
+                max-width: 95vw !important;
+                margin: 0 !important;
+            }
+        }
+        
+        /* Smooth scroll pour les ancres */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Amélioration des transitions */
+        .cercle-item {
+            transition: all 0.3s ease !important;
+        }
+        
+        /* Animation de révélation de la brèche inspirée de test_cartes.html */
+        .breach-reveal-animation {
+            /* valeur de départ uniforme */
+            clip-path: inset(0 0 100% 0);
+            -webkit-clip-path: inset(0 0 100% 0);
+            animation: clipDown 2.5s ease-out forwards;
+            -webkit-animation: clipDown 2.5s ease-out forwards;
+        }
+        
+        @keyframes clipDown {
+            /* from explicite = plus de surprise d'interpolation */
+            from { clip-path: inset(0 0 100% 0); }
+            to   { clip-path: inset(0 0 0 0); }
+        }
+        
+        @-webkit-keyframes clipDown {
+            from { -webkit-clip-path: inset(0 0 100% 0); }
+            to   { -webkit-clip-path: inset(0 0 0 0); }
+        }
+        
+        /* CSS MANQUANTS - Visibilité du contenu principal */
+        .content {
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        
+        .show-content {
+            opacity: 1;
+        }
+        
+        /* CSS MANQUANTS - Animations de déchirure des rideaux */
+        @keyframes tearLeft {
+            to { transform: translateX(-110%); }
+        }
+        
+        @keyframes tearRight {
+            to { transform: translateX(110%); }
+        }
+        
+        .tear-left {
+            animation: tearLeft 1s ease forwards;
+        }
+        
+        .tear-right {
+            animation: tearRight 1s ease forwards;
+        }
+    </style>
+</head>
+<body class="antialiased bg-[#f3ecdb]">
+    <!-- Animation de déchirure -->
+    <div id="tear-animation" class="fixed inset-0 z-50 flex">
+        <!-- Image du logo centrée en arrière-plan -->
+        <div class="absolute inset-0 flex items-center justify-center z-5 pointer-events-none opacity-40">
+            <img src="assets/images/Logo_breche.svg" alt="La Brèche" class="w-80 h-80 object-contain transform -translate-y-16" id="logo-center">
+        </div>
+        
+
+
+        <div id="left-half" class="paper-edge left-edge w-1/2 h-full bg-[#f3ecdb] flex items-center justify-end pr-10">
+        </div>
+        <div id="right-half" class="paper-edge right-edge w-1/2 h-full bg-[#f3ecdb] flex items-center justify-start pl-10">
+        </div>
+    </div>
+    
+    <!-- Couche supérieure pour les textes et bouton - SORTIE du conteneur tear-animation -->
+    <div id="text-overlay" class="fixed inset-0 pointer-events-none" style="z-index: 9999;">
+        <!-- Image de la brèche qui se dessine au-dessus de tout -->
+        <div id="breach-reveal" class="absolute inset-0 flex items-center justify-center pointer-events-none" style="opacity: 1;">
+            <img src="assets/images/breche_animation_1.png" alt="Brèche" class="max-w-full max-h-full object-contain" id="breach-image">
+        </div>
+        
+        <!-- Div centrée avec fond beige pour garantir la lisibilité -->
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-auto">
+            <div class="bg-[#f3ecdb] px-12 py-8 text-center rounded-full">
+                <h1 class="text-4xl font-bold text-[#2B2B2B] mb-2">Bienvenue dans la brèche</h1>
+                <p class="text-[#7A65BF] mb-6 text-lg">on en discute?</p>
+                <button onclick="startTearAnimation()" class="bg-[#7A65BF] hover:bg-[#6755A3] text-white px-8 py-3 rounded-full transition-all transform hover:scale-105 font-medium shadow-lg">
+                    Ouvrir une brèche ensemble
+                </button>
+            </div>
+        </div>
+    </div>
+        
+    <!-- Header -->
+    <header class="py-4 px-4 sm:px-6 lg:px-8 sticky top-0 bg-[#f3ecdb] z-50 shadow-sm content">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center">
+                <img src="assets/images/Logo_breche.svg" alt="La Brèche" class="h-12 object-contain">
+            </div>
+            
+            <!-- Navigation desktop -->
+            <nav class="hidden md:flex items-center space-x-8">
+                <a href="#about" class="text-neutral-800 hover:text-primary font-medium transition-colors">Qui sommes-nous</a>
+                <a href="#pourquoi-breche" class="text-neutral-800 hover:text-primary font-medium transition-colors">Pourquoi "La Brèche" ?</a>
+                <a href="#charte" class="text-neutral-800 hover:text-primary font-medium transition-colors">Notre charte</a>
+                <a href="#fonctionnement" class="text-neutral-800 hover:text-primary font-medium transition-colors">Fonctionnement</a>
+                <a href="#inscriptions cercles" class="text-neutral-800 hover:text-primary font-medium transition-colors">Inscription</a>
+            </nav>
+            
+            <!-- Bouton menu mobile -->
+            <div class="md:hidden">
+                <button type="button" id="mobile-menu-button" class="text-neutral-800 hover:text-primary focus:outline-none focus:text-primary transition-colors">
+                    <svg id="menu-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                    <svg id="close-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Menu mobile -->
+        <div id="mobile-menu" class="md:hidden hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1 bg-[#f3ecdb] border-t border-gray-200">
+                <a href="#about" class="mobile-menu-link block px-3 py-2 text-neutral-800 hover:text-primary hover:bg-white/50 font-medium transition-colors rounded-md">Qui sommes-nous</a>
+                <a href="#pourquoi-breche" class="mobile-menu-link block px-3 py-2 text-neutral-800 hover:text-primary hover:bg-white/50 font-medium transition-colors rounded-md">Pourquoi "La Brèche" ?</a>
+                <a href="#charte" class="mobile-menu-link block px-3 py-2 text-neutral-800 hover:text-primary hover:bg-white/50 font-medium transition-colors rounded-md">Notre charte</a>
+                <a href="#fonctionnement" class="mobile-menu-link block px-3 py-2 text-neutral-800 hover:text-primary hover:bg-white/50 font-medium transition-colors rounded-md">Fonctionnement</a>
+                <a href="#inscriptions cercles" class="mobile-menu-link block px-3 py-2 text-neutral-800 hover:text-primary hover:bg-white/50 font-medium transition-colors rounded-md">Inscription</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden content bg-gradient-to-br from-[#f3ecdb] via-[#f3ecdb]/90 to-[#7A65BF]/20">
+        
+        <div class="max-w-7xl mx-auto">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div class="scroll-animated from-left">
+                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+                        Ouvrir une <span class="relative inline-block breche-line text-primary">brèche</span> ensemble
+                    </h1>
+                    <p class="text-xl text-gray-600 mb-8 leading-relaxed">
+                        La Brèche organise des cercles d'écoute pour hommes et personnes au vécu d'homme sur Rennes. Un espace bienveillant et gratuit pour avancer ensemble.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <a href="#inscriptions cercles" class="btn-primary bg-primary hover:bg-primary text-white font-medium py-3 px-6 rounded-lg shadow-sm inline-flex items-center justify-center">
+                            <span>S'inscrire à un cercle</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </a>
+                        <a href="#fonctionnement" class="border border-primary text-primary font-medium py-3 px-6 rounded-lg hover:bg-secondary transition inline-flex items-center justify-center">
+                            <span>Comprendre le cadre</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="relative hidden md:block">
+                    <div class="absolute inset-0 bg-primary rounded-full opacity-10 blur-3xl transform -rotate-12"></div>
+                    <div class="relative bg-transparent p-6 rounded-2xl shadow-xl border border-gray-100">
+                        <div class="absolute -top-3 -left-3 w-8 h-8 bg-primary rounded-full flex items-center justify-center shadow-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-[#2B2B2B] mb-4">Nos objectifs</h3>
+                        <ul class="space-y-4">
+                            <li class="flex items-center scroll-animated from-right staggered-delay-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary mr-2 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                </svg>
+                                <span class="text-neutral-700">Créer un espace de parole bienveillant</span>
+                            </li>
+                            <li class="flex items-center scroll-animated from-right staggered-delay-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary mr-2 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                </svg>
+                                <span class="text-neutral-700">Sensibiliser aux enjeux du féminisme</span>
+                            </li>
+                            <li class="flex items-center scroll-animated from-right staggered-delay-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary mr-2 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                </svg>
+                                <span class="text-neutral-700">Accueillir de nouveaux alliés</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- La vague blanche a été supprimée -->
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-16 px-4 sm:px-6 lg:px-8 relative content bg-gradient-to-b from-[#7A65BF]/10 via-[#f3ecdb] to-white">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-3xl font-bold mb-8 text-center scroll-animated fade-in">Qui sommes-nous ?</h2>
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div class="scroll-animated from-left">
+                    <p class="text-lg text-gray-600 mb-6 leading-relaxed">
+                        La Brèche est un collectif qui propose des espaces féministes et bienveillants de réflexion et d'écoute. Nos cercles sont ouverts aux hommes et aux personnes ayant un vécu d'homme, et sont encadrés par des médiatrices. Le rôle des médiatrices dans les cercles est de veiller au cadre, faciliter les échanges, et garantir un espace d'écoute respectueux et bienveillant.
+                    </p>
+                    <h3 class="text-2xl font-semibold mb-6 text-primary">Nos objectifs</h3>
+                    <ul class="space-y-4 text-lg text-gray-600 mb-6">
+                        <li class="flex items-start">
+                            <span class="text-primary mr-3 mt-1">•</span>
+                            Créer un espace de parole bienveillant
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-primary mr-3 mt-1">•</span>
+                            Sensibiliser aux enjeux du féminisme
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-primary mr-3 mt-1">•</span>
+                            Accueillir de nouveaux alliés dans la lutte contre le patriarcat
+                        </li>
+                    </ul>
+                </div>
+                <div class="scroll-animated from-right">
+                    <h3 class="text-2xl font-semibold mb-6 text-primary">Quelques points importants</h3>
+                    <ul class="space-y-4 text-lg text-gray-600">
+                        <li class="flex items-start">
+                            <span class="text-primary mr-3 mt-1">•</span>
+                            Les cercles d'écoute sont gratuits et se déroulent à Rennes
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-primary mr-3 mt-1">•</span>
+                            La participation aux cercles est anonyme et les récits partagés par les participants sont confidentiels
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-primary mr-3 mt-1">•</span>
+                            Chaque participant•e est libre de se présenter avec le nom qu'iel souhaite.
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-primary mr-3 mt-1">•</span>
+                            C'est le lieu idéal pour pratiquer l'écoute active
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-primary mr-3 mt-1">•</span>
+                            Les cercles durent 2 heures (nous vous accueillons 15 minutes avant)
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pourquoi "La Brèche" ? Section -->
+    <section id="pourquoi-breche" class="py-16 px-4 sm:px-6 lg:px-8 relative content bg-gradient-to-b from-white via-[#f3ecdb]/60 to-[#7A65BF]/15">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 class="text-3xl font-bold mb-8 scroll-animated fade-in">Pourquoi "La Brèche" ?</h2>
+            <div class="text-lg text-gray-600 leading-relaxed scroll-animated fade-in staggered-delay-1">
+                <p class="mb-6">
+                    Parce qu'une brèche, c'est une ouverture dans un mur, une faille dans le système. C'est là où l'on s'infiltre, là où tout peut commencer à changer.
+                </p>
+                <p class="mb-6">
+                    Notre collectif s'appelle La Brèche parce que nous voulons ouvrir des espaces où la parole et la lutte contre les violences sexistes et sexuelles peuvent exister, créer des espaces où l'on peut comprendre, dialoguer, se questionner, transformer.
+                </p>
+                <p class="mb-6">
+                    C'est un point de rupture avec l'inaction, mais aussi un passage vers la déconstruction.
+                </p>
+                <p class="mb-6">
+                    La Brèche, c'est ce moment où quelque chose cède, en nous, autour de nous, et où un autre possible surgit.
+                </p>
+                <p class="font-semibold text-primary">
+                    Ouvrir une brèche, c'est commencer à faire autrement, ensemble.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Charte des cercles avec animation de cartes -->
+    <section id="charte" class="py-16 px-4 sm:px-6 lg:px-8 relative content bg-gradient-to-b from-[#7A65BF]/15 via-white to-[#f3ecdb]">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-3xl font-bold mb-8 text-center scroll-animated fade-in">Notre charte</h2>
+            <p class="text-lg text-gray-600 mb-8 text-center scroll-animated fade-in staggered-delay-1">
+                Découvrez les principes qui guident nos cercles en cliquant sur les cartes
+            </p>
+            
+            <!-- Container pour l'animation des cartes -->
+            <!-- Animation Coverflow unifiée pour Desktop et Mobile -->
+            <div class="charter-coverflow-container" id="charter-coverflow">
+                <!-- Les cartes seront générées par JavaScript -->
+            </div>
+            
+            <!-- Zone d'affichage du contenu de la carte sélectionnée -->
+            <div id="charter-content" class="max-w-3xl mx-auto bg-[#f3ecdb] p-6 rounded-2xl shadow-lg" style="display: none;">
+                <div class="flex items-start mb-4">
+                    <div class="flex-shrink-0 text-primary mr-3" id="charter-icon">
+                        <!-- L'icône sera insérée ici -->
+                    </div>
+                    <h3 class="font-bold text-xl text-primary" id="charter-title">Titre de la carte</h3>
+                </div>
+                <div id="charter-description" class="text-gray-700 space-y-2 text-sm leading-relaxed">
+                    <!-- Le contenu sera inséré ici -->
+                </div>
+            </div>
+            
+            <!-- Informations pratiques en bas -->
+            <div class="mt-12 grid md:grid-cols-3 gap-6">
+                <div class="text-center p-6 bg-primary/10 rounded-xl">
+                    <div class="text-primary mb-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                        </svg>
+                    </div>
+                    <h4 class="font-bold text-lg mb-2">Gratuit</h4>
+                    <p class="text-gray-600">Les cercles d'écoute sont entièrement gratuits</p>
+                </div>
+                
+                <div class="text-center p-6 bg-primary/10 rounded-xl">
+                    <div class="text-primary mb-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <h4 class="font-bold text-lg mb-2">Durée</h4>
+                    <p class="text-gray-600">2 heures (accueil 15 minutes avant)</p>
+                </div>
+                
+                <div class="text-center p-6 bg-primary/10 rounded-xl">
+                    <div class="text-primary mb-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <h4 class="font-bold text-lg mb-2">Remise en question</h4>
+                    <p class="text-gray-600">Je suis prêt à questionner mes constructions et à travailler sur moi</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How it works -->
+    <section id="fonctionnement" class="py-16 px-4 sm:px-6 lg:px-8 relative content bg-gradient-to-b from-[#f3ecdb] via-[#f3ecdb]/80 to-[#7A65BF]/25">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-3xl font-bold mb-12 text-center scroll-animated fade-in">Fonctionnement d'un cercle</h2>
+            
+            <div class="space-y-8">
+                <div class="flex items-start scroll-animated from-left">
+                    <div class="flex-shrink-0 bg-primary text-black rounded-full w-8 h-8 flex items-center justify-center font-bold mr-4 mt-1">1</div>
+                    <div>
+                        <h3 class="font-bold text-lg mb-2">Accueil</h3>
+                        <p class="text-gray-600">Nous vous accueillerons 15 minutes avant le début du cercle, pour que vous puissiez prendre le temps de vous installer tranquillement.<br>
+Le CRIDEV, le lieu qui nous héberge, met à disposition de quoi préparer une boisson chaude ou boire un verre d'eau, tout en découvrant ses différentes initiatives et chantiers militants.<br>
+Ce moment d'accueil peut aussi être l'occasion de réfléchir à la thématique du cercle et aux questions qu'elle peut faire émerger.<br>
+Le cercle commencera à l'heure. Il s'ouvrira par une courte présentation.</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start scroll-animated from-left staggered-delay-1">
+                    <div class="flex-shrink-0 bg-primary text-black rounded-full w-8 h-8 flex items-center justify-center font-bold mr-4 mt-1">2</div>
+                    <div>
+                        <h3 class="font-bold text-lg mb-2">Tour des prénoms/ pronoms et les ressentis</h3>
+                        <p class="text-gray-600">Chacun·e peut dire son prénom ou pseudo, ses pronoms, et partager brièvement ce qu'iel ressent et ses attentes autour de la thématique proposée</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start scroll-animated from-left staggered-delay-2">
+                    <div class="flex-shrink-0 bg-primary text-black rounded-full w-8 h-8 flex items-center justify-center font-bold mr-4 mt-1">3</div>
+                    <div>
+                        <h3 class="font-bold text-lg mb-2">Le cadre</h3>
+                        <p class="text-gray-600">En début de cercle, nous prendrons un moment pour poser ensemble le cadre qui permet un espace bienveillant et respectueux pour toutes et tous. Chacun·e est responsable de soi. Le respect de ses propres limites, tout comme celles des autres, est essentiel. Si ce cadre venait à ne pas être respecté, nous nous réservons la possibilité de ne plus proposer l'accès aux cercles à venir.</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start scroll-animated from-left staggered-delay-3">
+                    <div class="flex-shrink-0 bg-primary text-black rounded-full w-8 h-8 flex items-center justify-center font-bold mr-4 mt-1">4</div>
+                    <div>
+                        <h3 class="font-bold text-lg mb-2">Début du cercle sur la thématique du jour</h3>
+                        <p class="text-gray-600">Chaque cercle est unique. Les médiatrices sont là pour faciliter la parole et peuvent proposer des exercices ou des amorces autour du thème, afin d'ouvrir le sujet en douceur et favoriser les partages.</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start scroll-animated from-left staggered-delay-4">
+                    <div class="flex-shrink-0 bg-primary text-black rounded-full w-8 h-8 flex items-center justify-center font-bold mr-4 mt-1">5</div>
+                    <div>
+                        <h3 class="font-bold text-lg mb-2">Préparation à la clôture du cercle</h3>
+                        <p class="text-gray-600">Environ 30 minutes avant la fin, les médiatrices invitent les participant·es qui le souhaitent à compléter, approfondir ou déposer ce qui n'a pas encore été exprimé.</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start scroll-animated from-left staggered-delay-5">
+                    <div class="flex-shrink-0 bg-primary text-black rounded-full w-8 h-8 flex items-center justify-center font-bold mr-4 mt-1">6</div>
+                    <div>
+                        <h3 class="font-bold text-lg mb-2">Fin du cercle</h3>
+                        <p class="text-gray-600">Ce dernier tour de parole est l'occasion de partager ce que vous avez pensé ou ressenti pendant le cercle, et ce avec quoi vous repartez.</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start scroll-animated from-left staggered-delay-6">
+                    <div class="flex-shrink-0 bg-primary text-black rounded-full w-8 h-8 flex items-center justify-center font-bold mr-4 mt-1">7</div>
+                    <div>
+                        <h3 class="font-bold text-lg mb-2">Après le cercle</h3>
+                        <p class="text-gray-600">Vous recevrez un mail de retour de cercle avec les éventuelles références, ouvrages, BD ou podcasts pendant ce dernier ainsi que les dates des prochains cercles pour vous inscrire.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Registration Section -->
+    <section id="inscriptions cercles" class="py-20 px-4 sm:px-6 lg:px-8 relative content bg-gradient-to-b from-[#7A65BF]/30 via-[#7A65BF] to-[#7A65BF]/90">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-10">
+                <h2 class="text-4xl font-bold mb-4 inline-block breche-line text-white">Inscription</h2>
+                <p class="text-lg text-white max-w-2xl mx-auto mt-6">Réservez votre place pour participer à nos prochains cercles d'écoute :</p>
+            </div>
+            
+            <div class="max-w-2xl mx-auto mb-16">
+                <div class="bg-white p-8 rounded-xl relative overflow-hidden shadow-lg">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-[#7A65BF] opacity-20 rounded-full transform translate-x-10 -translate-y-10"></div>
+                    <h3 class="text-xl font-semibold mb-4 text-[#7A65BF] relative z-10 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                        </svg>
+                        À propos des inscriptions
+                    </h3>
+                    <ul class="space-y-4 text-neutral-700 relative z-10">
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 text-primary mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span>Les cercles sont <span class="font-medium">gratuits</span> et ouverts à tous les hommes / personnes au vécu d'hommes.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 text-primary mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span>Vous recevrez un <span class="font-medium">email de confirmation</span> après votre inscription.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 text-primary mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span>En cas d'annulation, merci de nous prévenir pour libérer votre place.</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+
+
+            <div class="mb-6 max-w-lg mx-auto" id="messages-container" style="display: none;">
+                <div class="p-4 mb-4 bg-green-50 border border-green-200 text-green-800 rounded-md" id="success-message" style="display: none;">
+                    Inscription réussie! Merci pour votre inscription.
+                </div>
+                <div class="p-4 mb-4 bg-red-50 border border-red-200 text-red-800 rounded-md" id="error-message" style="display: none;">
+                    Une erreur est survenue. Veuillez réessayer.
+                </div>
+            </div>
+            
+            <!-- Container pour les cercles dynamiques -->
+            <div id="cercles-container" class="grid md:grid-cols-3 gap-6 lg:gap-8">
+                <!-- Les cercles seront chargés ici dynamiquement par le JavaScript -->
+                <div class="col-span-3 text-center py-8">
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary mb-4"></div>
+                    <p class="text-neutral-600">Chargement des cercles disponibles...</p>
+                </div>
+            </div>
+
+            <!-- Template pour un cercle (caché, utilisé par JavaScript) -->
+            <template id="template-cercle">
+                <div class="cercle-item bg-white p-5 md:p-6 rounded-xl shadow-lg border border-gray-100 transform transition-all duration-300 hover:translate-y-[-5px] hover:shadow-xl flex flex-col min-h-[500px] h-auto relative pb-20">
+                    <h3 class="cercle-titre text-2xl font-semibold mb-6 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
+                        </svg>
+                        <span class="cercle-nom">Cercle d'écoute thématique</span>
+                    </h3>
+                    
+                    <div class="space-y-6">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 text-primary mr-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-medium">Date du prochain cercle</h4>
+                                <p class="cercle-date text-neutral-600">Vendredi 15 décembre 2024, 18h00 - 20h00</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 text-primary mr-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-medium">Lieu</h4>
+                                <p class="cercle-lieu text-neutral-600">CRIDEV, Avenue Janvier, Rennes</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 text-primary mr-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-medium">Référentes</h4>
+                                <p class="cercle-referentes text-neutral-600">Référentes à remplir</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 text-primary mr-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-medium">À propos de ce cercle</h4>
+                                <p class="cercle-description text-neutral-600">Description à remplir</p>
+                            </div>
+                        </div>
+                    
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 text-primary mr-3">
+                                <!-- Icon dynamique selon disponibilité -->
+                                <svg xmlns="http://www.w3.org/2000/svg" class="cercle-available-icon h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="green">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="cercle-full-icon h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="red" style="display: none;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-medium">Places disponibles</h4>
+                                <p class="text-neutral-600">
+                                    <span class="font-medium">
+                                        <span class="cercle-places-dispo" data-spots="true">0</span> places disponibles sur 
+                                        <span class="cercle-places-total">0</span>
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    
+                    <!-- Boutons en bas de la carte -->
+                    <div class="mt-auto pt-4">
+                        <!-- Bouton d'inscription standard (quand places disponibles) -->
+                        <button class="cercle-inscription-btn w-full btn-primary bg-[#7A65BF] hover:bg-[#665aa5] text-white font-medium py-2.5 px-4 rounded-lg transition-all flex items-center justify-center shadow-md text-sm md:text-base">
+                            <span class="inscription-texte">S'inscrire à ce cercle</span>
+                        </button>
+                        
+                        <!-- Bouton liste d'attente (quand cercle complet) -->
+                        <button class="cercle-liste-attente-btn w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-2.5 px-4 rounded-lg transition-all flex items-center justify-center shadow-md text-sm md:text-base" style="display: none;">
+                            S'inscrire sur liste d'attente
+                        </button>
+                        
+                        <!-- Bouton Ajouter au calendrier -->
+                        <button class="cercle-calendar-btn w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-4 rounded-lg transition-all flex items-center justify-center shadow-md text-sm md:text-base">
+                            <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+                            </svg>
+                            Ajouter ce cercle à mes évènements
+                        </button>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </section>
+
+
+
+
+    <!-- Location Section -->
+    <section class="py-16 px-4 sm:px-6 lg:px-8 relative content bg-gradient-to-b from-[#7A65BF]/90 via-white to-[#f3ecdb]/70">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 class="text-3xl font-bold mb-8 scroll-animated fade-in">Et le lieu :</h2>
+            <div class="text-lg text-gray-600 leading-relaxed scroll-animated fade-in staggered-delay-1">
+                <p class="mb-6">
+                    Sauf précision contraire, le lieu qui accueillera les cercles sera le CRIDEV. Il se situe avenue Janvier, proche du métro gare.
+                </p>
+                <a href="https://www.google.com/maps/dir/Gare+de+Rennes,+Place+de+la+Gare,+Rennes/CRIDEV+-+Centre+de+ressources+et+d'interpellation+pour+un+monde+sans+rapports+de+domination,+41+Av.+Jean+Janvier,+35000+Rennes/@48.1047006,-1.6747223,554m/data=!3m3!1e3!4b1!5s0x480edfb50c3b135f:0x51f014c819eeb1e0!4m14!4m13!1m5!1m1!1s0x480edf5a17b1de4d:0x9c3213f8e3e21a9f!2m2!1d-1.671638!2d48.103743!1m5!1m1!1s0x480edfb50a2bdf89:0x790d7217948eb503!2m2!1d-1.6726729!2d48.105633!3e2?entry=ttu&g_ep=EgoyMDI1MDgwNi4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener" class="inline-block bg-black text-white font-medium py-3 px-6 rounded-lg shadow-sm hover:bg-gray-800 transition">
+                    LIEN CARTE CRIDEV
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact CTA -->
+    <section class="py-16 px-4 sm:px-6 lg:px-8 relative text-white bg-gradient-to-b from-[#f3ecdb]/50 via-[#7A65BF] to-[#2B2B2B]">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 class="text-3xl font-bold mb-6 text-white">Une thématique à suggérer ou une question ?</h2>
+            <p class="text-xl mb-8 text-white">Contactez La Brèche via ce formulaire :</p>
+            <button onclick="openContactPopup()" class="inline-block bg-[#f3ecdb] text-[#2B2B2B] font-bold py-4 px-8 rounded-xl shadow-lg hover:bg-white transition transform hover:scale-105">
+                Nous contacter
+            </button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-4 sm:px-6 lg:px-8 bg-gray-900 text-gray-300">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-white font-bold text-lg mb-4">La Brèche</h3>
+                    <p class="mb-4">Cercles d'écoute pour hommes alliés et futurs alliés, avec référentes féminines.</p>
+                    <p>Association loi 1901 • RNA: W123456789</p>
+                </div>
+                
+                <div>
+                    <h3 class="text-white font-bold text-lg mb-4">Liens</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="hover:text-white hover:underline">Mentions légales</a></li>
+                        <li><a href="#" class="hover:text-white hover:underline">Politique de confidentialité</a></li>
+                        <li><a href="#" class="hover:text-white hover:underline">Charte des cercles</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-white font-bold text-lg mb-4">Contact</h3>
+                    <p class="mb-2">contact@labreche.org</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="hover:text-white">Twitter</a>
+                        <a href="#" class="hover:text-white">Instagram</a>
+                        <a href="#" class="hover:text-white">Facebook</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-12 pt-6 border-t border-gray-800 text-sm">
+                <p>Les données d'inscription (email et adresse IP) sont traitées pour limiter les abus et organiser les séances. Durée : 12 mois. Droits : contact@labreche.org</p>
+            </div>
+        </div>
+    </footer>
+    <!-- JavaScript pour le formulaire d'inscription et la gestion des places -->
+    <!-- Pop-up d'inscription -->    
+    <div class="popup-overlay" id="inscription-popup">
+        <div class="popup-content">
+            <div class="popup-header">
+                <h3 class="text-xl font-semibold">Formulaire d'inscription</h3>
+                <button class="popup-close" id="close-popup">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="popup-body">
+                <div class="mb-6" id="popup-messages-container" style="display: none;">
+                    <div class="p-4 mb-4 bg-green-50 border border-green-200 text-green-800 rounded-md" id="popup-success-message" style="display: none;">
+                        Inscription réussie! Merci pour votre inscription.
+                    </div>
+                    <div class="p-4 mb-4 bg-red-50 border border-red-200 text-red-800 rounded-md" id="popup-error-message" style="display: none;">
+                        Une erreur est survenue. Veuillez réessayer.
+                    </div>
+                </div>
+                
+                <!-- Info-bulle liste d'attente -->
+                <div class="waiting-list-info p-4 mb-6 bg-orange-50 border-l-4 border-orange-500 rounded" style="display: none;">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-orange-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-orange-700">
+                                <strong>Inscription sur liste d'attente</strong> - Ce cercle est actuellement complet. Vous serez contacté(e) en cas de désistement.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <form id="popup-registration-form" class="space-y-5" method="POST" action="https://script.google.com/macros/s/AKfycbxCG8SPwSEuwb_Pl-SfAAa7c5ezYwKMjwkyhUuYBYW9VJU96MyuBnBVaHBkXWkqP4Frxg/exec">
+                    <h2 class="text-xl font-semibold text-center mb-6 popup-title">Inscription au cercle</h2>
+                    
+                    <div>
+                        <label for="popup-first-name" class="block mb-2 text-sm font-medium text-neutral-700">Prénom</label>
+                        <div class="relative">
+                            <input type="text" name="Name" id="popup-first-name" class="pl-10 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm py-2 px-4 border" placeholder="Votre prénom" required>
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                        </div>
+                        <p id="popup-first-name-error" class="mt-1.5 text-sm text-red-600 flex items-center popup-error" style="display: none;">
+                            <svg class="h-4 w-4 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                            </svg>
+                            Ce champ est requis
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <label for="popup-last-name" class="block mb-2 text-sm font-medium text-neutral-700">Nom</label>
+                        <div class="relative">
+                            <input type="text" name="LastName" id="popup-last-name" class="pl-10 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm py-2 px-4 border" placeholder="Votre nom" required>
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                        </div>
+                        <p id="popup-last-name-error" class="mt-1.5 text-sm text-red-600 flex items-center popup-error" style="display: none;">
+                            <svg class="h-4 w-4 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                            </svg>
+                            Ce champ est requis
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <label for="popup-email" class="block mb-2 text-sm font-medium text-neutral-700">Email</label>
+                        <div class="relative">
+                            <input type="email" name="Email" id="popup-email" class="pl-10 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm py-2 px-4 border" placeholder="exemple@email.com" required>
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                                    <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                                </svg>
+                            </div>
+                        </div>
+                        <p id="popup-email-error" class="mt-1.5 text-sm text-red-600 flex items-center popup-error" style="display: none;">
+                            <svg class="h-4 w-4 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                            </svg>
+                            Adresse email invalide
+                        </p>
+                    </div>
+                    
+                    <button id="popup-submit-btn" type="submit" class="w-full btn-primary bg-primary hover:bg-primary-dark text-white font-medium py-3.5 px-6 rounded-lg transition-all flex items-center justify-center shadow-md">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        Confirmer mon inscription
+                    </button>
+                </form>
+                
+                <!-- Message de succès après inscription -->
+                <div id="popup-success-message" class="text-center py-8 px-4" style="display: none;">
+                    <svg class="mx-auto h-12 w-12 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <h3 id="popup-success-title" class="mt-2 text-xl font-medium text-gray-900">Inscription confirmée</h3>
+                    <p class="mt-1 text-sm text-gray-600">
+                        Merci pour votre inscription ! Nous vous contacterons par email avec les détails pratiques.
+                    </p>
+                    
+                    <!-- Calendar Integration Section -->
+                    <div id="calendar-integration" class="mt-6 p-4 bg-gray-50 rounded-lg">
+                        <h4 class="text-lg font-medium text-gray-900 mb-3">Ajouter à votre agenda</h4>
+                        <p class="text-sm text-gray-600 mb-4">N'oubliez pas votre cercle ! Ajoutez-le directement à votre agenda personnel :</p>
+                        
+                        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                            <!-- Google Calendar Button -->
+                            <a id="google-calendar-link" href="#" target="_blank" rel="noopener" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none transition-colors">
+                                <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+                                </svg>
+                                Google Calendar
+                            </a>
+                            
+                            <!-- Download .ics Button -->
+                            <button id="download-ics" type="button" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none transition-colors">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                Télécharger (.ics)
+                            </button>
+                        </div>
+                        
+                        <p class="text-xs text-gray-500 mt-3">
+                            Le fichier .ics fonctionne avec tous les calendriers (Apple, Outlook, etc.)
+                        </p>
+                    </div>
+                    
+                    <div class="mt-6">
+                        <button type="button" class="popup-close-btn inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary-dark focus:outline-none">
+                            Fermer
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pop-up de contact -->
+    <div class="popup-overlay" id="contact-popup">
+        <div class="popup-content">
+            <div class="popup-header">
+                <h3 class="text-xl font-semibold">Nous contacter</h3>
+                <button class="popup-close" id="close-contact-popup">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="popup-body">
+                <div class="mb-6" id="contact-popup-messages-container" style="display: none;">
+                    <div class="p-4 mb-4 bg-green-50 border border-green-200 text-green-800 rounded-md" id="contact-popup-success-message" style="display: none;">
+                        Votre message a été envoyé avec succès ! Nous vous répondrons rapidement.
+                    </div>
+                    <div class="p-4 mb-4 bg-red-50 border border-red-200 text-red-800 rounded-md" id="contact-popup-error-message" style="display: none;">
+                        Une erreur est survenue. Veuillez réessayer.
+                    </div>
+                </div>
+                
+                <form id="contact-popup-form" class="space-y-5">
+                    <h2 class="text-xl font-semibold text-center mb-6">Une thématique à suggérer ou une question ?</h2>
+                    
+                    <div>
+                        <label for="contact-popup-name" class="block mb-2 text-sm font-medium text-neutral-700">Nom / Prénom</label>
+                        <input type="text" name="name" id="contact-popup-name" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm py-2 px-4 border" placeholder="Votre nom" required>
+                    </div>
+                    
+                    <div>
+                        <label for="contact-popup-email" class="block mb-2 text-sm font-medium text-neutral-700">Email</label>
+                        <input type="email" name="email" id="contact-popup-email" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm py-2 px-4 border" placeholder="votre@email.com" required>
+                    </div>
+                    
+                    <div>
+                        <label for="contact-popup-subject" class="block mb-2 text-sm font-medium text-neutral-700">Sujet</label>
+                        <select name="subject" id="contact-popup-subject" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm py-2 px-4 border" required>
+                            <option value="">Sélectionnez un sujet</option>
+                            <option value="Suggestion de thématique">Suggestion de thématique</option>
+                            <option value="Question générale">Question générale</option>
+                            <option value="Problème d'inscription">Problème d'inscription</option>
+                            <option value="Autre">Autre</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label for="contact-popup-message" class="block mb-2 text-sm font-medium text-neutral-700">Message</label>
+                        <textarea name="message" id="contact-popup-message" rows="4" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm py-2 px-4 border resize-vertical" placeholder="Votre message..." required></textarea>
+                    </div>
+                    
+                    <button id="contact-popup-submit-btn" type="submit" class="w-full btn-primary bg-primary hover:bg-primary-dark text-white font-medium py-3.5 px-6 rounded-lg transition-all flex items-center justify-center shadow-md">
+                        <span id="contact-popup-submit-text">Envoyer le message</span>
+                        <div id="contact-popup-loading" class="hidden inline-block animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white ml-2"></div>
+                    </button>
+                </form>
+                
+                <!-- Message de succès après envoi -->
+                <div id="contact-popup-success-content" class="text-center py-8 px-4" style="display: none;">
+                    <svg class="mx-auto h-12 w-12 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <h3 class="mt-2 text-xl font-medium text-gray-900">Message envoyé !</h3>
+                    <p class="mt-1 text-sm text-gray-600">
+                        Votre message a été envoyé avec succès ! Nous vous répondrons rapidement.
+                    </p>
+                    
+                    <!-- Calendar Integration Section for Contact Form -->
+                    <div id="contact-calendar-integration" class="mt-6 p-4 bg-gray-50 rounded-lg">
+                        <h4 class="text-lg font-medium text-gray-900 mb-3">Ajouter nos prochains cercles à votre agenda</h4>
+                        <p class="text-sm text-gray-600 mb-4">En attendant notre réponse, découvrez nos prochains cercles et ajoutez-les à votre agenda :</p>
+                        
+                        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                            <!-- Google Calendar Button -->
+                            <a id="contact-google-calendar-link" href="#" target="_blank" rel="noopener" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none transition-colors">
+                                <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+                                </svg>
+                                Google Calendar
+                            </a>
+                            
+                            <!-- Download .ics Button -->
+                            <button id="contact-download-ics" type="button" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none transition-colors">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                Télécharger (.ics)
+                            </button>
+                        </div>
+                        
+                        <p class="text-xs text-gray-500 mt-3">
+                            Le fichier .ics fonctionne avec tous les calendriers (Apple, Outlook, etc.)
+                        </p>
+                    </div>
+                    
+                    <div class="mt-6">
+                        <button type="button" class="contact-popup-close-btn inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary-dark focus:outline-none">
+                            Fermer
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Le script a été déplacé vers un fichier externe -->    
+    <script src="assets/js/script.js"></script>
+    <script src="assets/js/mobile-menu.js"></script>
+    <script src="assets/js/charter-cards.js"></script>
+    <script src="assets/js/fix-tear-animation.js"></script>
+    <script src="assets/js/calendar-integration.js"></script>
+</body>
+</html>

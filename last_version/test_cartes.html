@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Animation Brèche</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .image-container {
+      width: 80vw;
+      max-width: 800px;
+      overflow: hidden;
+      animation: clipDown 3s ease-out forwards;
+      clip-path: inset(0 0 100% 0); /* masque tout sauf le haut */
+    }
+
+    @keyframes clipDown {
+      to {
+        clip-path: inset(0 0 0 0); /* révèle l'image entièrement */
+      }
+    }
+
+    img {
+      width: 100%;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="image-container">
+    <img src="breche_animation_1.png" alt="Animation Brèche">
+  </div>
+
+</body>
+</html>
