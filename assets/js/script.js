@@ -1008,6 +1008,12 @@ function initializeForm() {
                     if (messagesContainer) messagesContainer.style.display = 'block';
                     if (successMessage) successMessage.style.display = 'block';
                     
+                    // Initialiser l'intégration calendrier
+                    if (typeof initializeCalendarIntegration === 'function') {
+                        const circleData = getSelectedCircleData();
+                        initializeCalendarIntegration(circleData);
+                    }
+                    
                     // Ajouter un bouton pour fermer le popup après l'inscription
                     if (successMessage) {
                         // Créer le bouton de fermeture s'il n'existe pas déjà
@@ -1355,6 +1361,11 @@ async function handleContactFormSubmit(event) {
             form.style.display = 'none';
             if (successContent) {
                 successContent.style.display = 'block';
+            }
+            
+            // Initialiser l'intégration calendrier pour le formulaire de contact
+            if (typeof initializeContactCalendarIntegration === 'function') {
+                initializeContactCalendarIntegration();
             }
         } else {
             throw new Error('Échec de l\'envoi');
