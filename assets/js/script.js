@@ -243,11 +243,66 @@ function continueWithTearAnimation() {
 }
 
 /**
- * Démarre l'animation de déchirure et révèle le contenu
+ * Démarre la nouvelle animation mignonne en deux parties
  */
 function startTearAnimation() {
-    // PREMIÈRE ACTION : Démarrer immédiatement l'animation de révélation de la brèche
-    startBreachRevealAnimation();
+    // Créer l'animation de division mignonne
+    createCuteSplitAnimation();
+}
+
+/**
+ * Crée une animation mignonne de division en deux parties
+ */
+function createCuteSplitAnimation() {
+    // Créer le conteneur d'animation
+    const animationContainer = document.createElement('div');
+    animationContainer.className = 'cute-split-animation';
+    animationContainer.id = 'cute-split-container';
+    
+    // Créer les deux moitiés
+    const leftHalf = document.createElement('div');
+    leftHalf.className = 'split-half split-left';
+    
+    const rightHalf = document.createElement('div');
+    rightHalf.className = 'split-half split-right';
+    
+    // Ajouter les moitiés au conteneur
+    animationContainer.appendChild(leftHalf);
+    animationContainer.appendChild(rightHalf);
+    
+    // Ajouter au body
+    document.body.appendChild(animationContainer);
+    
+    // Déclencher l'animation après un court délai
+    setTimeout(() => {
+        leftHalf.classList.add('animate');
+        rightHalf.classList.add('animate');
+        
+        // Masquer l'animation d'origine et révéler le contenu après l'animation
+        setTimeout(() => {
+            // Masquer l'animation d'origine
+            const tearAnimation = document.getElementById('tear-animation');
+            const textOverlay = document.getElementById('text-overlay');
+            
+            if (tearAnimation) tearAnimation.style.display = 'none';
+            if (textOverlay) textOverlay.style.display = 'none';
+            
+            // Révéler le contenu principal
+            const contentElements = document.querySelectorAll('.content');
+            contentElements.forEach(element => {
+                element.classList.add('show-content');
+            });
+            
+            // Supprimer l'animation de division après un délai
+            setTimeout(() => {
+                if (animationContainer && animationContainer.parentNode) {
+                    animationContainer.parentNode.removeChild(animationContainer);
+                }
+            }, 500);
+            
+        }, 1200); // Durée de l'animation de division
+        
+    }, 100); // Petit délai pour s'assurer que l'élément est dans le DOM
 }
 
 /**

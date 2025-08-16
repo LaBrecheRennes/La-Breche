@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>La Brèche — Ouvrir une brèche pour mieux écouter</title>
     <meta name="description" content="Cercles d'écoute entre hommes, avec des référentes féminines qui écoutent et cadrent si nécessaire. Cadre bienveillant, responsabilité, engagements concrets.">
+    <link rel="icon" type="image/png" href="assets/images/B_detoure.png">
+    <link rel="shortcut icon" type="image/png" href="assets/images/B_detoure.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,141 +14,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link rel="stylesheet" href="assets/css/styles.css">
-    <style>
-        /* Améliorations responsivité mobile */
-        @media (max-width: 768px) {
-            .cercle-item {
-                min-height: 400px !important;
-                padding: 1rem !important;
-            }
-            
-            .cercle-titre {
-                font-size: 1.25rem !important;
-                margin-bottom: 1rem !important;
-            }
-            
-            .space-y-6 > * + * {
-                margin-top: 1rem !important;
-            }
-            
-            /* Animation de déchirure mobile */
-            #tear-animation {
-                flex-direction: column;
-            }
-            
-            #left-half, #right-half {
-                width: 100% !important;
-                height: 50% !important;
-                padding: 1rem !important;
-            }
-            
-            #left-half {
-                justify-content: center !important;
-                text-align: center !important;
-            }
-            
-            #right-half {
-                justify-content: center !important;
-                text-align: center !important;
-            }
-            
-            #logo-center {
-                width: 200px !important;
-                height: 200px !important;
-            }
-            
-            /* Header mobile */
-            .sticky {
-                padding: 0.5rem 1rem !important;
-            }
-            
-            /* Hero section mobile */
-            .py-24 {
-                padding-top: 3rem !important;
-                padding-bottom: 3rem !important;
-            }
-            
-            /* Grid des cercles mobile */
-            .md\:grid-cols-3 {
-                grid-template-columns: 1fr !important;
-                gap: 1rem !important;
-            }
-            
-            /* Popup mobile */
-            .popup-overlay {
-                padding: 1rem !important;
-            }
-            
-            .popup-content {
-                max-width: 95vw !important;
-                margin: 0 !important;
-            }
-        }
-        
-        /* Smooth scroll pour les ancres */
-        html {
-            scroll-behavior: smooth;
-        }
-        
-        /* Amélioration des transitions */
-        .cercle-item {
-            transition: all 0.3s ease !important;
-        }
-        
-        /* Animation de révélation de la brèche inspirée de test_cartes.html */
-        .breach-reveal-animation {
-            /* valeur de départ uniforme */
-            clip-path: inset(0 0 100% 0);
-            -webkit-clip-path: inset(0 0 100% 0);
-            animation: clipDown 2.5s ease-out forwards;
-            -webkit-animation: clipDown 2.5s ease-out forwards;
-        }
-        
-        @keyframes clipDown {
-            /* from explicite = plus de surprise d'interpolation */
-            from { clip-path: inset(0 0 100% 0); }
-            to   { clip-path: inset(0 0 0 0); }
-        }
-        
-        @-webkit-keyframes clipDown {
-            from { -webkit-clip-path: inset(0 0 100% 0); }
-            to   { -webkit-clip-path: inset(0 0 0 0); }
-        }
-        
-        /* CSS MANQUANTS - Visibilité du contenu principal */
-        .content {
-            opacity: 0;
-            transition: opacity 0.4s ease;
-        }
-        
-        .show-content {
-            opacity: 1;
-        }
-        
-        /* CSS MANQUANTS - Animations de déchirure des rideaux */
-        @keyframes tearLeft {
-            to { transform: translateX(-110%); }
-        }
-        
-        @keyframes tearRight {
-            to { transform: translateX(110%); }
-        }
-        
-        .tear-left {
-            animation: tearLeft 1s ease forwards;
-        }
-        
-        .tear-right {
-            animation: tearRight 1s ease forwards;
-        }
-    </style>
+
 </head>
-<body class="antialiased bg-[#f3ecdb]">
+<body class="antialiased">
     <!-- Animation de déchirure -->
     <div id="tear-animation" class="fixed inset-0 z-50 flex">
         <!-- Image du logo centrée en arrière-plan -->
         <div class="absolute inset-0 flex items-center justify-center z-5 pointer-events-none opacity-40">
-            <img src="assets/images/Logo_breche.svg" alt="La Brèche" class="w-80 h-80 object-contain transform -translate-y-16" id="logo-center">
+            <img src="assets/images/Logo_breche.png" alt="La Brèche" class="w-80 h-80 object-contain transform -translate-y-16" id="logo-center">
         </div>
         
 
@@ -159,17 +34,11 @@
     
     <!-- Couche supérieure pour les textes et bouton - SORTIE du conteneur tear-animation -->
     <div id="text-overlay" class="fixed inset-0 pointer-events-none" style="z-index: 9999;">
-        <!-- Image de la brèche qui se dessine au-dessus de tout -->
-        <div id="breach-reveal" class="absolute inset-0 flex items-center justify-center pointer-events-none" style="opacity: 1;">
-            <img src="assets/images/breche_animation_1.png" alt="Brèche" class="max-w-full max-h-full object-contain" id="breach-image">
-        </div>
-        
-        <!-- Div centrée avec fond beige pour garantir la lisibilité -->
-        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-auto">
-            <div class="bg-[#f3ecdb] px-12 py-8 text-center rounded-full">
-                <h1 class="text-4xl font-bold text-[#2B2B2B] mb-2">Bienvenue dans la brèche</h1>
-                <p class="text-[#7A65BF] mb-6 text-lg">on en discute?</p>
-                <button onclick="startTearAnimation()" class="bg-[#7A65BF] hover:bg-[#6755A3] text-white px-8 py-3 rounded-full transition-all transform hover:scale-105 font-medium shadow-lg">
+        <!-- Div centrée avec fond beige pour garantir la lisibilité - VERSION RESPONSIVE -->
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-auto p-4">
+            <div class="bg-[#f3ecdb] px-6 sm:px-8 md:px-12 py-6 sm:py-8 text-center rounded-2xl sm:rounded-full max-w-md sm:max-w-lg md:max-w-xl w-full">
+                <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-[#2B2B2B] mb-4 sm:mb-6">Bienvenue dans la brèche</h1>
+                <button onclick="startTearAnimation()" class="bg-[#7A65BF] hover:bg-[#6755A3] text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-full transition-all transform hover:scale-105 font-medium shadow-lg text-sm sm:text-base">
                     Ouvrir une brèche ensemble
                 </button>
             </div>
@@ -177,10 +46,10 @@
     </div>
         
     <!-- Header -->
-    <header class="py-4 px-4 sm:px-6 lg:px-8 sticky top-0 bg-[#f3ecdb] z-50 shadow-sm content">
+    <header class="py-4 px-4 sm:px-6 lg:px-8 sticky top-0 z-50 shadow-sm content" style="display: none;">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <div class="flex items-center">
-                <img src="assets/images/Logo_breche.svg" alt="La Brèche" class="h-12 object-contain">
+                <img src="assets/images/Logo_breche.png" alt="La Brèche" class="h-12 object-contain" style="transform: scale(1.1);">
             </div>
             
             <!-- Navigation desktop -->
@@ -218,7 +87,7 @@
     </header>
 
     <!-- Hero Section -->
-    <section class="py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden content bg-gradient-to-br from-[#f3ecdb] via-[#f3ecdb]/90 to-[#7A65BF]/20">
+    <section class="py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden content bg-gradient-to-b from-[#f3ecdb] via-[#f3ecdb]/95 to-[#7A65BF]/5">
         
         <div class="max-w-7xl mx-auto">
             <div class="grid md:grid-cols-2 gap-12 items-center">
@@ -280,7 +149,7 @@
     </section>
 
     <!-- About Section -->
-    <section id="about" class="py-16 px-4 sm:px-6 lg:px-8 relative content bg-gradient-to-b from-[#7A65BF]/10 via-[#f3ecdb] to-white">
+    <section id="about" class="py-16 px-4 sm:px-6 lg:px-8 relative content bg-gradient-to-b from-[#7A65BF]/5 via-[#f3ecdb]/90 to-white">
         <div class="max-w-4xl mx-auto">
             <h2 class="text-3xl font-bold mb-8 text-center scroll-animated fade-in">Qui sommes-nous ?</h2>
             <div class="grid md:grid-cols-2 gap-12 items-center">
@@ -420,7 +289,7 @@
     </section>
 
     <!-- How it works -->
-    <section id="fonctionnement" class="py-16 px-4 sm:px-6 lg:px-8 relative content bg-gradient-to-b from-[#f3ecdb] via-[#f3ecdb]/80 to-[#7A65BF]/25">
+    <section id="fonctionnement" class="py-16 px-4 sm:px-6 lg:px-8 relative content bg-gradient-to-b from-[#f3ecdb] via-[#f3ecdb]/70 to-[#7A65BF]/50">
         <div class="max-w-4xl mx-auto">
             <h2 class="text-3xl font-bold mb-12 text-center scroll-animated fade-in">Fonctionnement d'un cercle</h2>
             
@@ -488,42 +357,55 @@ Le cercle commencera à l'heure. Il s'ouvrira par une courte présentation.</p>
     </section>
 
     <!-- Registration Section -->
-    <section id="inscriptions cercles" class="py-20 px-4 sm:px-6 lg:px-8 relative content bg-gradient-to-b from-[#7A65BF]/30 via-[#7A65BF] to-[#7A65BF]/90">
+    <section id="inscriptions cercles" class="py-20 px-4 sm:px-6 lg:px-8 relative content bg-gradient-to-b from-[#7A65BF]/50 via-[#7A65BF]/80 to-[#7A65BF]/90">
         <div class="max-w-7xl mx-auto">
             <div class="text-center mb-10">
                 <h2 class="text-4xl font-bold mb-4 inline-block breche-line text-white">Inscription</h2>
-                <p class="text-lg text-white max-w-2xl mx-auto mt-6">Réservez votre place pour participer à nos prochains cercles d'écoute :</p>
-            </div>
-            
-            <div class="max-w-2xl mx-auto mb-16">
-                <div class="bg-white p-8 rounded-xl relative overflow-hidden shadow-lg">
-                    <div class="absolute top-0 right-0 w-32 h-32 bg-[#7A65BF] opacity-20 rounded-full transform translate-x-10 -translate-y-10"></div>
-                    <h3 class="text-xl font-semibold mb-4 text-[#7A65BF] relative z-10 flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                <div class="text-lg text-white max-w-4xl mx-auto mt-6 space-y-4">
+                    <p class="font-semibold text-xl mb-6 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        À propos des inscriptions
-                    </h3>
-                    <ul class="space-y-4 text-neutral-700 relative z-10">
-                        <li class="flex items-start">
-                            <svg class="w-5 h-5 text-primary mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            <span>Les cercles sont <span class="font-medium">gratuits</span> et ouverts à tous les hommes / personnes au vécu d'hommes.</span>
-                        </li>
-                        <li class="flex items-start">
-                            <svg class="w-5 h-5 text-primary mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            <span>Vous recevrez un <span class="font-medium">email de confirmation</span> après votre inscription.</span>
-                        </li>
-                        <li class="flex items-start">
-                            <svg class="w-5 h-5 text-primary mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            <span>En cas d'annulation, merci de nous prévenir pour libérer votre place.</span>
-                        </li>
-                    </ul>
+                        À propos des inscriptions :
+                    </p>
+                    
+                    <div class="grid md:grid-cols-3 gap-6 mb-8">
+                        <div class="flex flex-col items-center text-center p-4 bg-white/10 rounded-xl backdrop-blur-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mb-3 text-yellow-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                            </svg>
+                            <p class="text-sm">Les cercles sont <span class="font-medium text-yellow-300">gratuits</span> et ouverts à tous les hommes / personnes au vécu d'hommes.</p>
+                        </div>
+                        
+                        <div class="flex flex-col items-center text-center p-4 bg-white/10 rounded-xl backdrop-blur-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mb-3 text-green-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                            <p class="text-sm">Vous recevrez un <span class="font-medium text-green-300">email de confirmation</span> après votre inscription.</p>
+                        </div>
+                        
+                        <div class="flex flex-col items-center text-center p-4 bg-white/10 rounded-xl backdrop-blur-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mb-3 text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                            </svg>
+                            <p class="text-sm">En cas d'annulation, merci de nous prévenir pour libérer votre place.</p>
+                        </div>
+                    </div>
+                    
+                    <p class="font-semibold text-xl mt-8 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 002 2z" />
+                        </svg>
+                        Réservez votre place pour participer à nos prochains cercles d'écoute :
+                    </p>
                 </div>
             </div>
             
 
+            
 
-            <div class="mb-6 max-w-lg mx-auto" id="messages-container" style="display: none;">
+
+            <div class="mb-12 max-w-lg mx-auto" id="messages-container" style="display: none;">
                 <div class="p-4 mb-4 bg-green-50 border border-green-200 text-green-800 rounded-md" id="success-message" style="display: none;">
                     Inscription réussie! Merci pour votre inscription.
                 </div>
@@ -543,7 +425,7 @@ Le cercle commencera à l'heure. Il s'ouvrira par une courte présentation.</p>
 
             <!-- Template pour un cercle (caché, utilisé par JavaScript) -->
             <template id="template-cercle">
-                <div class="cercle-item bg-white p-5 md:p-6 rounded-xl shadow-lg border border-gray-100 transform transition-all duration-300 hover:translate-y-[-5px] hover:shadow-xl flex flex-col min-h-[500px] h-auto relative pb-20">
+                <div class="cercle-item bg-white p-5 md:p-6 rounded-xl shadow-lg border border-gray-100 transform transition-all duration-300 hover:translate-y-[-5px] hover:shadow-xl flex flex-col min-h-[500px] h-auto relative pb-20" style="background-image: url('assets/images/fond_bleu_rouge.png'), url('assets/images/fond_pour_cercle.png'); background-size: cover, cover; background-position: center, center; background-repeat: no-repeat, no-repeat; background-blend-mode: soft-light, overlay; background-color: rgba(255, 255, 255, 0.75);">
                     <h3 class="cercle-titre text-2xl font-semibold mb-6 flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
@@ -645,7 +527,7 @@ Le cercle commencera à l'heure. Il s'ouvrira par une courte présentation.</p>
 
 
     <!-- Location Section -->
-    <section class="py-16 px-4 sm:px-6 lg:px-8 relative content bg-gradient-to-b from-[#7A65BF]/90 via-white to-[#f3ecdb]/70">
+    <section class="py-16 px-4 sm:px-6 lg:px-8 relative content bg-gradient-to-b from-[#7A65BF]/90 via-white to-[#f3ecdb]">
         <div class="max-w-4xl mx-auto text-center">
             <h2 class="text-3xl font-bold mb-8 scroll-animated fade-in">Et le lieu :</h2>
             <div class="text-lg text-gray-600 leading-relaxed scroll-animated fade-in staggered-delay-1">
@@ -660,18 +542,18 @@ Le cercle commencera à l'heure. Il s'ouvrira par une courte présentation.</p>
     </section>
 
     <!-- Contact CTA -->
-    <section class="py-16 px-4 sm:px-6 lg:px-8 relative text-white bg-gradient-to-b from-[#f3ecdb]/50 via-[#7A65BF] to-[#2B2B2B]">
-        <div class="max-w-4xl mx-auto text-center">
+    <section class="py-16 px-4 sm:px-6 lg:px-8 relative text-white bg-gradient-to-b from-[#ddd0b8] via-[#7A65BF] to-[#7A65BF] logo-transition-section">
+        <div class="max-w-4xl mx-auto text-center relative z-10">
             <h2 class="text-3xl font-bold mb-6 text-white">Une thématique à suggérer ou une question ?</h2>
-            <p class="text-xl mb-8 text-white">Contactez La Brèche via ce formulaire :</p>
-            <button onclick="openContactPopup()" class="inline-block bg-[#f3ecdb] text-[#2B2B2B] font-bold py-4 px-8 rounded-xl shadow-lg hover:bg-white transition transform hover:scale-105">
+            <p class="text-xl mb-8 text-white/90">Contactez La Brèche via ce formulaire :</p>
+            <button onclick="openContactPopup()" class="inline-block bg-white text-[#7A65BF] font-bold py-4 px-8 rounded-xl shadow-lg hover:bg-gray-100 transition transform hover:scale-105">
                 Nous contacter
             </button>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="py-12 px-4 sm:px-6 lg:px-8 bg-gray-900 text-gray-300">
+    <footer class="py-12 px-4 sm:px-6 lg:px-8 bg-[#7A65BF] text-white">
         <div class="max-w-7xl mx-auto">
             <div class="grid md:grid-cols-3 gap-8">
                 <div>
@@ -683,9 +565,9 @@ Le cercle commencera à l'heure. Il s'ouvrira par une courte présentation.</p>
                 <div>
                     <h3 class="text-white font-bold text-lg mb-4">Liens</h3>
                     <ul class="space-y-2">
-                        <li><a href="#" class="hover:text-white hover:underline">Mentions légales</a></li>
-                        <li><a href="#" class="hover:text-white hover:underline">Politique de confidentialité</a></li>
-                        <li><a href="#" class="hover:text-white hover:underline">Charte des cercles</a></li>
+                        <li><a href="#" class="hover:text-gray-200 hover:underline">Mentions légales</a></li>
+                        <li><a href="#" class="hover:text-gray-200 hover:underline">Politique de confidentialité</a></li>
+                        <li><a href="#" class="hover:text-gray-200 hover:underline">Charte des cercles</a></li>
                     </ul>
                 </div>
                 
@@ -693,14 +575,14 @@ Le cercle commencera à l'heure. Il s'ouvrira par une courte présentation.</p>
                     <h3 class="text-white font-bold text-lg mb-4">Contact</h3>
                     <p class="mb-2">contact@labreche.org</p>
                     <div class="flex space-x-4">
-                        <a href="#" class="hover:text-white">Twitter</a>
-                        <a href="#" class="hover:text-white">Instagram</a>
-                        <a href="#" class="hover:text-white">Facebook</a>
+                        <a href="#" class="hover:text-gray-200">Twitter</a>
+                        <a href="#" class="hover:text-gray-200">Instagram</a>
+                        <a href="#" class="hover:text-gray-200">Facebook</a>
                     </div>
                 </div>
             </div>
             
-            <div class="mt-12 pt-6 border-t border-gray-800 text-sm">
+            <div class="mt-12 pt-6 border-t border-white/20 text-sm">
                 <p>Les données d'inscription (email et adresse IP) sont traitées pour limiter les abus et organiser les séances. Durée : 12 mois. Droits : contact@labreche.org</p>
             </div>
         </div>
@@ -931,6 +813,8 @@ Le cercle commencera à l'heure. Il s'ouvrira par une courte présentation.</p>
     <!-- Le script a été déplacé vers un fichier externe -->    
     <script src="assets/js/script.js"></script>
     <script src="assets/js/mobile-menu.js"></script>
+    <script src="assets/js/dynamic-header.js"></script>
+    <script src="assets/js/circle-backgrounds.js"></script>
     <script src="assets/js/charter-cards.js"></script>
     <script src="assets/js/fix-tear-animation.js"></script>
     <script src="assets/js/calendar-integration.js"></script>

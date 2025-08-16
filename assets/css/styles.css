@@ -12,6 +12,32 @@
 
 body {
     font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    overflow-x: hidden;
+    background: white;
+}
+
+/* Correction globale pour éliminer les marges beiges */
+* {
+    box-sizing: border-box;
+}
+
+/* S'assurer que toutes les sections occupent toute la largeur */
+section {
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    box-sizing: border-box;
+}
+
+/* Correction des conteneurs max-width */
+.max-w-7xl, .max-w-6xl, .max-w-4xl, .max-w-2xl {
+    max-width: none !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding-left: max(1rem, calc((100vw - 1200px) / 2));
+    padding-right: max(1rem, calc((100vw - 1200px) / 2));
 }
 
 h1, h2, h3, h4 {
@@ -305,7 +331,23 @@ h1, h2, h3, h4 {
     line-height: 1.1;
 }
 
+/* Media queries pour la responsivité */
 @media (max-width: 768px) {
+    /* Correction spécifique mobile pour les sections */
+    section {
+        margin-left: 0 !important;
+        width: 100% !important;
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+    
+    /* Conteneurs mobiles */
+    .max-w-7xl, .max-w-6xl, .max-w-4xl, .max-w-2xl {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+    
+    /* Charter coverflow */
     .charter-coverflow-container {
         height: 220px;
         max-width: 100%;
@@ -329,4 +371,428 @@ h1, h2, h3, h4 {
     .charter-card .card-title {
         font-size: 0.6rem;
     }
+}
+
+/* Media queries pour tablettes */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .max-w-7xl, .max-w-6xl, .max-w-4xl, .max-w-2xl {
+        padding-left: 2rem !important;
+        padding-right: 2rem !important;
+    }
+}
+
+/* ===== CSS DÉPLACÉ DEPUIS LE HTML POUR NETTOYAGE ===== */
+
+/* Animation de déchirure mignonne en deux parties */
+.cute-split-animation {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    pointer-events: none;
+}
+
+.split-half {
+    position: absolute;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(135deg, #f3ecdb 0%, #7A65BF 100%);
+    transition: transform 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.split-left {
+    left: 0;
+    transform-origin: left center;
+    clip-path: polygon(0 0, 100% 0, 85% 100%, 0 100%);
+}
+
+.split-right {
+    right: 0;
+    transform-origin: right center;
+    clip-path: polygon(15% 0, 100% 0, 100% 100%, 0 100%);
+}
+
+.split-left.animate {
+    transform: translateX(-100%) rotateY(-15deg);
+}
+
+.split-right.animate {
+    transform: translateX(100%) rotateY(15deg);
+}
+
+/* Smooth scroll pour les ancres */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Amélioration des transitions */
+.cercle-item {
+    transition: all 0.3s ease !important;
+}
+
+/* Logo background transition animation */
+.logo-transition-section {
+    position: relative;
+    overflow: hidden;
+}
+
+.logo-background-transition {
+    transition: opacity 2s ease-in-out, transform 3s ease-in-out;
+    animation: logoFloat 6s ease-in-out infinite;
+}
+
+.logo-transition-section:hover .logo-background-transition {
+    opacity: 0.4 !important;
+    transform: scale(1.1);
+}
+
+@keyframes logoFloat {
+    0%, 100% { 
+        transform: translateY(0px) scale(1);
+        opacity: 0.2;
+    }
+    50% { 
+        transform: translateY(-10px) scale(1.05);
+        opacity: 0.35;
+    }
+}
+
+/* Amélioration de la transition vers la dernière section */
+.logo-transition-section::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    background: linear-gradient(to bottom, transparent, rgba(43, 43, 43, 0.1));
+    pointer-events: none;
+}
+
+/* Correction du décalage initial global */
+#tear-animation, #text-overlay {
+    left: 0 !important;
+    right: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Animation de révélation de la brèche */
+.breach-reveal-animation {
+    clip-path: inset(0 0 100% 0);
+    -webkit-clip-path: inset(0 0 100% 0);
+    animation: clipDown 2.5s ease-out forwards;
+    -webkit-animation: clipDown 2.5s ease-out forwards;
+}
+
+@keyframes clipDown {
+    from { clip-path: inset(0 0 100% 0); }
+    to   { clip-path: inset(0 0 0 0); }
+}
+
+@-webkit-keyframes clipDown {
+    from { -webkit-clip-path: inset(0 0 100% 0); }
+    to   { -webkit-clip-path: inset(0 0 0 0); }
+}
+
+/* CSS MANQUANTS - Animations de déchirure des rideaux */
+@keyframes tearLeft {
+    to { transform: translateX(-110%); }
+}
+
+@keyframes tearRight {
+    to { transform: translateX(110%); }
+}
+
+.tear-left {
+    animation: tearLeft 1s ease forwards;
+}
+
+.tear-right {
+    animation: tearRight 1s ease forwards;
+}
+
+/* Media queries spécifiques pour mobile */
+@media (max-width: 768px) {
+    /* Amélioration de l'animation de départ mobile */
+    .cute-split-animation .split-half {
+        clip-path: none !important;
+    }
+    
+    .cute-split-animation .split-left {
+        transform-origin: center !important;
+    }
+    
+    .cute-split-animation .split-right {
+        transform-origin: center !important;
+    }
+    
+    .cute-split-animation .split-left.animate {
+        transform: translateY(-100%) !important;
+    }
+    
+    .cute-split-animation .split-right.animate {
+        transform: translateY(100%) !important;
+    }
+    
+    /* Correction du centrage initial */
+    #text-overlay {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    
+    #text-overlay > div {
+        position: static !important;
+        transform: none !important;
+    }
+    
+    .cercle-item {
+        min-height: 400px !important;
+        padding: 1rem !important;
+    }
+    
+    .cercle-titre {
+        font-size: 1.25rem !important;
+        margin-bottom: 1rem !important;
+    }
+    
+    .space-y-6 > * + * {
+        margin-top: 1rem !important;
+    }
+    
+    /* Animation de déchirure mobile */
+    #tear-animation {
+        flex-direction: column;
+    }
+    
+    #left-half, #right-half {
+        width: 100% !important;
+        height: 50% !important;
+        padding: 1rem !important;
+    }
+    
+    #left-half {
+        justify-content: center !important;
+        text-align: center !important;
+    }
+    
+    #right-half {
+        justify-content: center !important;
+        text-align: center !important;
+    }
+    
+    #logo-center {
+        width: 200px !important;
+        height: 200px !important;
+    }
+    
+    /* Header mobile */
+    .sticky {
+        padding: 0.5rem 1rem !important;
+    }
+    
+    /* Hero section mobile */
+    .py-24 {
+        padding-top: 3rem !important;
+        padding-bottom: 3rem !important;
+    }
+    
+    /* Grid des cercles mobile */
+    .md\:grid-cols-3 {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+    }
+    
+    /* Popup mobile */
+    .popup-overlay {
+        padding: 1rem !important;
+    }
+    
+    .popup-content {
+        max-width: 95vw !important;
+        margin: 0 !important;
+    }
+}
+
+/* Amélioration des transitions de fond pour éviter les ruptures visibles */
+.seamless-transition {
+    position: relative;
+}
+
+.seamless-transition::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(to right, transparent, rgba(122, 101, 191, 0.3), transparent);
+    z-index: 1;
+}
+
+.seamless-transition::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(to right, transparent, rgba(122, 101, 191, 0.3), transparent);
+    z-index: 1;
+}
+
+/* Animation organique et féministe pour l'ouverture du site */
+@keyframes organicDoorLeft {
+    0% { 
+        transform: translateX(0) rotate(0deg) scale(1);
+        border-radius: 0;
+        opacity: 1;
+    }
+    30% {
+        transform: translateX(-10px) rotate(-1deg) scale(1.02);
+        border-radius: 0 50px 50px 0;
+        opacity: 0.95;
+    }
+    60% {
+        transform: translateX(-40%) rotate(-2deg) scale(1.05);
+        border-radius: 0 100px 100px 0;
+        opacity: 0.8;
+    }
+    100% { 
+        transform: translateX(-120%) rotate(-3deg) scale(1.1);
+        border-radius: 0 150px 150px 0;
+        opacity: 0;
+    }
+}
+
+@keyframes organicDoorRight {
+    0% { 
+        transform: translateX(0) rotate(0deg) scale(1);
+        border-radius: 0;
+        opacity: 1;
+    }
+    30% {
+        transform: translateX(10px) rotate(1deg) scale(1.02);
+        border-radius: 50px 0 0 50px;
+        opacity: 0.95;
+    }
+    60% {
+        transform: translateX(40%) rotate(2deg) scale(1.05);
+        border-radius: 100px 0 0 100px;
+        opacity: 0.8;
+    }
+    100% { 
+        transform: translateX(120%) rotate(3deg) scale(1.1);
+        border-radius: 150px 0 0 150px;
+        opacity: 0;
+    }
+}
+
+@keyframes logoBloom {
+    0% { 
+        opacity: 0.4; 
+        transform: translateY(-4rem) scale(1) rotate(0deg);
+        filter: brightness(1);
+    }
+    25% {
+        opacity: 0.7; 
+        transform: translateY(-4rem) scale(1.05) rotate(2deg);
+        filter: brightness(1.1);
+    }
+    50% { 
+        opacity: 0.9; 
+        transform: translateY(-4rem) scale(1.15) rotate(-1deg);
+        filter: brightness(1.2);
+    }
+    75% {
+        opacity: 0.6; 
+        transform: translateY(-4rem) scale(1.1) rotate(1deg);
+        filter: brightness(1.1);
+    }
+    100% { 
+        opacity: 0; 
+        transform: translateY(-6rem) scale(0.8) rotate(0deg);
+        filter: brightness(0.8);
+    }
+}
+
+@keyframes textGentleFade {
+    0% { 
+        opacity: 1; 
+        transform: scale(1) translateY(0);
+        filter: blur(0px);
+    }
+    40% { 
+        opacity: 1; 
+        transform: scale(1.01) translateY(-5px);
+        filter: blur(0px);
+    }
+    70% {
+        opacity: 0.7; 
+        transform: scale(0.98) translateY(-10px);
+        filter: blur(1px);
+    }
+    100% { 
+        opacity: 0; 
+        transform: scale(0.95) translateY(-20px);
+        filter: blur(3px);
+    }
+}
+
+/* Effet de particules féminines (optionnel) */
+@keyframes floatingParticles {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 0;
+    }
+    20% {
+        opacity: 0.6;
+    }
+    80% {
+        opacity: 0.6;
+    }
+    100% {
+        transform: translateY(-100vh) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+.organic-door-left {
+    animation: organicDoorLeft 2.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.organic-door-right {
+    animation: organicDoorRight 2.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.logo-fade-out {
+    animation: logoFadeOut 1.2s ease-in-out forwards;
+}
+
+.logo-bloom {
+    animation: logoBloom 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.text-fade-out {
+    animation: textFadeOut 1s ease-in-out forwards;
+}
+
+.text-gentle-fade {
+    animation: textGentleFade 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* Amélioration des cartes d'inscription avec backdrop-blur */
+.inscription-card {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.inscription-card:hover {
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    transform: translateY(-2px);
 }
