@@ -44,7 +44,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <link rel="stylesheet" href="assets/css/styles.css?v=20250821-2">
+    <link rel="stylesheet" href="assets/css/styles.css">
 
 </head>
 <body class="antialiased">
@@ -52,7 +52,7 @@
     <div id="tear-animation" class="fixed inset-0 z-50 flex">
         <!-- Image du logo centrée en arrière-plan -->
         <div class="absolute inset-0 flex items-center justify-center z-5 pointer-events-none">
-            <img src="assets/images/Logo_breche.png" alt="La Brèche" class="w-80 h-80 object-contain translate-x-2" id="logo-center">
+            <img src="assets/images/2_low.png" alt="La Brèche" class="w-96 h-96 sm:w-[500px] sm:h-[500px] lg:w-[600px] lg:h-[600px] object-contain" id="logo-center">
         </div>
         
 
@@ -77,10 +77,12 @@
     </div>
         
     <!-- Header -->
-    <header class="py-4 px-4 sm:px-6 lg:px-8 fixed top-0 left-0 right-0 z-50 shadow-sm content bg-white" style="display: none;">
+    <header class="py-2 px-4 fixed top-0 left-0 right-0 z-50 shadow-sm content bg-white">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <div class="flex items-center min-w-0">
-                <img src="assets/images/Logo_breche.png" alt="La Brèche" class="h-12 object-contain max-w-full">
+            <div class="relative" style="width: 160px; height: 80px;">
+                <!-- Logos superposés avec transition -->
+                <img src="assets/images/2_low.png" alt="La Brèche" id="header-logo-initial" style="position: absolute; top: 0; left: 0; height: 100%; width: auto; opacity: 1;">
+                <img src="assets/images/3_low.png" alt="La Brèche" id="header-logo-final" style="position: absolute; top: 0; left: 0; height: 100%; width: auto; opacity: 0;">  
             </div>
             
             <!-- Navigation desktop -->
@@ -185,9 +187,9 @@
     <section id="about" class="py-16 px-4 sm:px-6 lg:px-8 relative content bg-gradient-to-b from-[#7A65BF]/5 via-[#f3ecdb]/90 to-white">
         <div class="max-w-4xl mx-auto">
             <h2 class="text-3xl font-bold mb-8 text-center scroll-animated fade-in">Qui sommes-nous ?</h2>
-            <div class="grid md:grid-cols-2 gap-12 items-center">
-                <div class="scroll-animated from-left">
-                    <p class="text-lg text-gray-600 mb-6 leading-relaxed text-left">
+            <div class="grid md:grid-cols-2 gap-12 items-start">
+                <div class="scroll-animated from-left text-left">
+                    <p class="text-lg text-gray-600 mb-6 leading-relaxed">
                         La Brèche est un collectif qui propose des espaces féministes et bienveillants de réflexion et d'écoute. Nos cercles sont ouverts aux hommes et aux personnes ayant un vécu d'homme, et sont encadrés par des médiatrices. Le rôle des médiatrices dans les cercles est de veiller au cadre, faciliter les échanges, et garantir un espace d'écoute respectueux et bienveillant.
                     </p>
                     <h3 class="text-2xl font-semibold mb-6 text-primary">Nos objectifs</h3>
@@ -206,7 +208,7 @@
                         </li>
                     </ul>
                 </div>
-                <div class="scroll-animated from-right">
+                <div class="scroll-animated from-right text-left">
                     <h3 class="text-2xl font-semibold mb-6 text-primary">Quelques points importants</h3>
                     <ul class="space-y-4 text-lg text-gray-600">
                         <li class="flex items-start min-w-0">
@@ -567,9 +569,22 @@ Le cercle commencera à l'heure. Il s'ouvrira par une courte présentation.</p>
                 <p class="mb-6">
                     Sauf précision contraire, le lieu qui accueillera les cercles sera le CRIDEV. Il se situe avenue Janvier, proche du métro gare.
                 </p>
+                
+                <!-- Carte interactive du CRIDEV -->
+                <div class="map-container mb-6 mx-auto rounded-lg overflow-hidden shadow-lg" style="max-width: 600px; height: 400px;">
+                    <iframe 
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2663.809750650431!2d-1.6818572234077913!3d48.105112971322095!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x480ede3414467475%3A0x97d73363a4c20217!2sCRIDEV!5e0!3m2!1sfr!2sfr!4v1631274145932!5m2!1sfr!2sfr" 
+                        width="100%" 
+                        height="100%" 
+                        style="border:0;" 
+                        allowfullscreen="" 
+                        loading="lazy" 
+                        referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
+                </div>
                 <div class="text-center">
                     <a href="https://www.google.com/maps/dir/Gare+de+Rennes,+Place+de+la+Gare,+Rennes/CRIDEV+-+Centre+de+ressources+et+d'interpellation+pour+un+monde+sans+rapports+de+domination,+41+Av.+Jean+Janvier,+35000+Rennes/@48.1047006,-1.6747223,554m/data=!3m3!1e3!4b1!5s0x480edfb50c3b135f:0x51f014c819eeb1e0!4m14!4m13!1m5!1m1!1s0x480edf5a17b1de4d:0x9c3213f8e3e21a9f!2m2!1d-1.671638!2d48.103743!1m5!1m1!1s0x480edfb50a2bdf89:0x790d7217948eb503!2m2!1d-1.6726729!2d48.105633!3e2?entry=ttu&g_ep=EgoyMDI1MDgwNi4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener" class="inline-block bg-black text-white font-medium py-3 px-6 rounded-lg shadow-sm hover:bg-gray-800 transition">
-                    Localiser le CRIDEV
+                    Lien Google Maps 
                 </a>
             </div>
         </div>
@@ -609,7 +624,7 @@ Le cercle commencera à l'heure. Il s'ouvrira par une courte présentation.</p>
                     <h3 class="text-white font-bold text-lg mb-4">Contact</h3>
                     <p class="mb-2 text-left">labreche.rennes@gmail.com</p>
                     <div class="flex space-x-4">
-                        <a href="#" class="hover:text-gray-200">Instagram</a>
+                        <a href="https://www.instagram.com/collectif.labreche/" class="hover:text-gray-200">Instagram</a>
                     </div>
                 </div>
             </div>
@@ -843,13 +858,13 @@ Le cercle commencera à l'heure. Il s'ouvrira par une courte présentation.</p>
     </div>
 
     <!-- Le script a été déplacé vers un fichier externe -->    
-    <script src="assets/js/script.js?v=20250821-2"></script>
-    <script src="assets/js/mobile-menu.js?v=20250821-2"></script>
-    <script src="assets/js/dynamic-header.js?v=20250821-2"></script>
-    <script src="assets/js/circle-backgrounds.js?v=20250821-2"></script>
-    <script src="assets/js/charter-cards.js?v=20250821-2"></script>
-    <script src="assets/js/fix-tear-animation.js?v=20250821-2"></script>
-    <script src="assets/js/calendar-integration.js?v=20250821-2"></script>
+    <script src="assets/js/script.js"></script>
+    <script src="assets/js/mobile-menu.js"></script>
+    <script src="assets/js/dynamic-header.js"></script>
+    <script src="assets/js/circle-backgrounds.js"></script>
+    <script src="assets/js/charter-cards.js"></script>
+    <script src="assets/js/fix-tear-animation.js"></script>
+    <script src="assets/js/calendar-integration.js"></script>
     
     <script>
     (function () {
@@ -891,5 +906,10 @@ Le cercle commencera à l'heure. Il s'ouvrira par une courte présentation.</p>
       new MutationObserver(apply).observe(header, { attributes: true, attributeFilter: ['class','style'] });
     })();
     </script>
+    
+    <!-- Script de transition pour les logos du header -->
+    <script src="assets/js/logo-transition.js"></script>
+    <!-- Script de préchargement du logo pour l'animation -->
+    <script src="assets/js/logo-preload.js"></script>
 </body>
 </html>

@@ -33,6 +33,9 @@ function updateHeaderColorAndVisibility() {
   // On gère la couleur de fond
   header.style.backgroundColor = css;
   
+  // NOTE: La gestion des transitions de logos a été déplacée vers logo-transition.js
+  // pour simplifier la gestion et éviter les conflits
+  
   // Déterminer la direction du défilement
   const currentScrollPosition = window.scrollY;
   
@@ -98,7 +101,8 @@ function initDynamicHeader() {
 function showHeaderAfterAnimation() {
     const header = document.querySelector('header');
     if (header) {
-        header.style.display = 'block';
+        // Utilise opacity au lieu de display pour une transition plus douce
+        header.style.opacity = '1';
         header.style.transform = 'translateY(0)';
         headerVisible = true;
         console.log('✅ Header affiché après animation');

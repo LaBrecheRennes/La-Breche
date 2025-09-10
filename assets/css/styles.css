@@ -660,101 +660,48 @@ section[id], div[id] {
     z-index: 1;
 }
 
-/* Animation organique et féministe pour l'ouverture du site */
-@keyframes organicDoorLeft {
+/* Animation simplifiée pour l'ouverture du site */
+@keyframes simpleDoorLeft {
     0% { 
-        transform: translateX(0) rotate(0deg) scale(1);
-        border-radius: 0;
+        transform: translateX(0);
         opacity: 1;
     }
-    30% {
-        transform: translateX(-10px) rotate(-1deg) scale(1.02);
-        border-radius: 0 50px 50px 0;
-        opacity: 0.95;
-    }
-    60% {
-        transform: translateX(-40%) rotate(-2deg) scale(1.05);
-        border-radius: 0 100px 100px 0;
-        opacity: 0.8;
-    }
     100% { 
-        transform: translateX(-120%) rotate(-3deg) scale(1.1);
-        border-radius: 0 150px 150px 0;
-        opacity: 0;
+        transform: translateX(-100%);
+        opacity: 0.8;
     }
 }
 
-@keyframes organicDoorRight {
+@keyframes simpleDoorRight {
     0% { 
-        transform: translateX(0) rotate(0deg) scale(1);
-        border-radius: 0;
+        transform: translateX(0);
         opacity: 1;
     }
-    30% {
-        transform: translateX(10px) rotate(1deg) scale(1.02);
-        border-radius: 50px 0 0 50px;
-        opacity: 0.95;
-    }
-    60% {
-        transform: translateX(40%) rotate(2deg) scale(1.05);
-        border-radius: 100px 0 0 100px;
-        opacity: 0.8;
-    }
     100% { 
-        transform: translateX(120%) rotate(3deg) scale(1.1);
-        border-radius: 150px 0 0 150px;
-        opacity: 0;
+        transform: translateX(100%);
+        opacity: 0.8;
     }
 }
 
-@keyframes logoBloom {
+@keyframes logoSimpleZoom {
     0% { 
         opacity: 1; 
-        transform: translateX(4px) scale(1) rotate(0deg);
-        filter: brightness(1);
+        transform: scale(1);
     }
-    25% {
+    100% { 
         opacity: 1; 
-        transform: translateX(4px) scale(1.05) rotate(1deg);
-        filter: brightness(1.1);
+        transform: scale(1.1);
     }
-    50% { 
+}
+
+@keyframes textSimpleFade {
+    0% { 
         opacity: 1; 
-        transform: translateX(4px) scale(1.15) rotate(-0.5deg);
-        filter: brightness(1.2);
-    }
-    75% {
-        opacity: 0.9; 
-        transform: translateX(4px) scale(1.1) rotate(0.5deg);
-        filter: brightness(1.1);
+        transform: translateY(0);
     }
     100% { 
         opacity: 0; 
-        transform: translateX(4px) scale(0.95) rotate(0deg);
-        filter: brightness(0.8);
-    }
-}
-
-@keyframes textGentleFade {
-    0% { 
-        opacity: 1; 
-        transform: scale(1) translateY(0);
-        filter: blur(0px);
-    }
-    40% { 
-        opacity: 1; 
-        transform: scale(1.01) translateY(-5px);
-        filter: blur(0px);
-    }
-    70% {
-        opacity: 0.7; 
-        transform: scale(0.98) translateY(-10px);
-        filter: blur(1px);
-    }
-    100% { 
-        opacity: 0; 
-        transform: scale(0.95) translateY(-20px);
-        filter: blur(3px);
+        transform: translateY(-10px);
     }
 }
 
@@ -777,27 +724,28 @@ section[id], div[id] {
 }
 
 .organic-door-left {
-    animation: organicDoorLeft 2.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    animation: simpleDoorLeft 1.2s ease-out forwards;
 }
 
 .organic-door-right {
-    animation: organicDoorRight 2.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    animation: simpleDoorRight 1.2s ease-out forwards;
 }
 
 .logo-fade-out {
-    animation: logoFadeOut 1.2s ease-in-out forwards;
+    /* Classe conservée pour compatibilité mais pas utilisée */
+    opacity: 1;
 }
 
 .logo-bloom {
-    animation: logoBloom 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    animation: logoSimpleZoom 1.2s ease-out forwards;
 }
 
 .text-fade-out {
-    animation: textFadeOut 1s ease-in-out forwards;
+    animation: textSimpleFade 0.5s ease-out forwards;
 }
 
 .text-gentle-fade {
-    animation: textGentleFade 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    animation: textSimpleFade 0.5s ease-out forwards;
 }
 
 /* Amélioration des cartes d'inscription avec backdrop-blur */
@@ -805,6 +753,42 @@ section[id], div[id] {
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     transition: all 0.3s ease;
+}
+
+/* Styles pour les logos du header */
+/* Taille du bloc logo (responsive) */
+.header-logo-container{
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: auto;
+  min-width: 240px;
+  /* hauteur explicite */
+  height: 64px;
+}
+@media (min-width: 768px){ .header-logo-container{ height: 72px; } }
+@media (min-width:1024px){ .header-logo-container{ height: 84px; } }
+
+/* Les deux images se superposent et prennent 100% de la hauteur du conteneur */
+.header-logo{
+  position: absolute;
+  inset: 0 auto 0 0;   /* top:0; bottom:0; left:0 */
+  margin: auto 0;
+  height: 100%;
+  width: auto;
+  max-height: 100%;
+  object-fit: contain;
+  transition: opacity 300ms ease;
+  background: transparent;
+}
+
+.initial-logo {
+    opacity: 1;
+}
+
+.final-logo {
+    opacity: 0;
 }
 
 /* Styles pour le drag-to-scroll des cartes de la charte */
