@@ -1,5 +1,5 @@
 /**
- * Google Apps Script pour gérer les inscriptions aux cercles d'écoute La Brèche
+ * Google Apps Script pour gérer les inscriptions aux cercles de parole La Brèche
  * Ce script doit être déployé comme une application web dans Google Apps Script
  */
 
@@ -83,7 +83,7 @@ function doPost(e) {
  */
 function doGet(e) {
   console.log('Requête GET reçue');
-  return createResponse(true, "API Google Apps Script pour La Brèche - Inscriptions aux cercles d'écoute");
+  return createResponse(true, "API Google Apps Script pour La Brèche - Inscriptions aux cercles de parole");
 }
 
 /**

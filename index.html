@@ -625,8 +625,8 @@ Le cercle commencera à l'heure. Il s'ouvrira par une courte présentation.</p>
                 <div>
                     <h3 class="text-white font-bold text-lg mb-4">Liens</h3>
                     <ul class="space-y-2">
-                        <li><a class="hover:text-gray-200 hover:underline cursor-pointer">Mentions légales</a></li>
-                        <li><a class="hover:text-gray-200 hover:underline cursor-pointer">Politique de confidentialité</a></li>
+                        <li><a onclick="openLegalPopup()" class="hover:text-gray-200 hover:underline cursor-pointer">Mentions légales</a></li>
+                        <li><a onclick="openPrivacyPopup()" class="hover:text-gray-200 hover:underline cursor-pointer">Politique de confidentialité</a></li>
                         <li><a href="#charte" class="hover:text-gray-200 hover:underline">Charte des cercles</a></li>
                     </ul>
                 </div>
@@ -868,6 +868,228 @@ Le cercle commencera à l'heure. Il s'ouvrira par une courte présentation.</p>
         </div>
     </div>
 
+    <!-- Pop-up Mentions Légales -->
+    <div class="popup-overlay" id="legal-popup">
+        <div class="popup-content popup-doc" role="dialog" aria-modal="true" aria-labelledby="legal-title">
+            <div class="popup-header">
+                <h3 class="popup-title" id="legal-title">Mentions Légales</h3>
+                <button class="popup-close" onclick="closeLegalPopup()" aria-label="Fermer">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="popup-body">
+                <section class="doc-section">
+                    <h4>1. Éditeur du site</h4>
+                    <p>
+                        <strong>Collectif La Brèche</strong><br>
+                        Rennes, France<br>
+                        <a href="mailto:labreche.rennes@gmail.com">labreche.rennes@gmail.com</a>
+                    </p>
+                </section>
+
+                <section class="doc-section">
+                    <h4>2. Responsable de publication</h4>
+                    <p>
+                        <strong>Denis Berthelot</strong><br>
+                        Responsable légal du site web<br>
+                        Contact : <a href="mailto:labreche.rennes@gmail.com">labreche.rennes@gmail.com</a>
+                    </p>
+                </section>
+
+                <section class="doc-section">
+                    <h4>3. Hébergement</h4>
+                    <p>
+                        Ce site est hébergé par <strong>Hostinger</strong><br>
+                        Hostinger International Ltd.<br>
+                        61 Lordou Vironos Street, 6023 Larnaca, Chypre<br>
+                        <a href="https://www.hostinger.fr" target="_blank" rel="noopener">www.hostinger.fr</a>
+                    </p>
+                </section>
+
+                <section class="doc-section">
+                    <h4>4. Propriété intellectuelle</h4>
+                    <p>
+                        L'ensemble du contenu de ce site (textes, images, logos, graphismes) est la propriété du Collectif La Brèche et est protégé par les lois françaises et internationales relatives à la propriété intellectuelle.
+                    </p>
+                    <p>
+                        Toute reproduction, distribution, modification ou utilisation non autorisée du contenu de ce site est strictement interdite.
+                    </p>
+                </section>
+
+                <section class="doc-section">
+                    <h4>5. Cookies et traceurs</h4>
+                    <p>
+                        <strong>Ce site n'utilise pas de cookies</strong> et ne collecte aucune donnée de navigation à des fins de tracking ou de publicité.
+                    </p>
+                    <p>
+                        Les seules données collectées le sont dans le cadre des inscriptions aux cercles de parole (nom, prénom, email) et sont nécessaires à l'organisation des événements.
+                    </p>
+                </section>
+
+                <section class="doc-section">
+                    <h4>6. Protection des données personnelles</h4>
+                    <p>
+                        Conformément au Règlement Général sur la Protection des Données (RGPD) et à la loi Informatique et Libertés, vous disposez d'un droit d'accès, de rectification, de suppression et d'opposition au traitement de vos données personnelles.
+                    </p>
+                    <p>
+                        Pour exercer ces droits, vous pouvez nous contacter à l'adresse : <a href="mailto:labreche.rennes@gmail.com">labreche.rennes@gmail.com</a>
+                    </p>
+                    <p>
+                        <strong>Durée de conservation :</strong> Les données d'inscription sont conservées pendant 12 mois maximum.
+                    </p>
+                </section>
+
+                <section class="doc-section">
+                    <h4>7. Responsabilité</h4>
+                    <p>
+                        Le Collectif La Brèche s'efforce d'assurer l'exactitude et la mise à jour des informations diffusées sur ce site. Toutefois, nous ne pouvons garantir l'exactitude, la précision ou l'exhaustivité des informations mises à disposition.
+                    </p>
+                    <p>
+                        Les liens hypertextes présents sur ce site peuvent renvoyer vers des sites tiers. Le Collectif La Brèche ne peut être tenu responsable du contenu de ces sites externes.
+                    </p>
+                </section>
+
+                <section class="doc-section">
+                    <h4>8. Droit applicable</h4>
+                    <p>
+                        Les présentes mentions légales sont régies par le droit français. En cas de litige, les tribunaux français seront seuls compétents.
+                    </p>
+                </section>
+            </div>
+            <div class="popup-footer">
+                <p class="text-sm text-gray-500">Dernière mise à jour : Octobre 2025</p>
+            </div>
+        </div>
+    </div>
+  
+    <!-- Pop-up Politique de confidentialité -->
+    <div class="popup-overlay" id="privacy-popup">
+        <div class="popup-content popup-doc" role="dialog" aria-modal="true" aria-labelledby="privacy-title">
+            <div class="popup-header">
+                <h3 class="popup-title" id="privacy-title">Politique de Confidentialité</h3>
+                <button class="popup-close" onclick="closePrivacyPopup()" aria-label="Fermer">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="popup-body">
+                <section class="doc-section">
+                    <h4>1. Introduction</h4>
+                    <p>
+                        Le Collectif La Brèche accorde une grande importance à la protection de vos données personnelles et s'engage à les traiter de manière transparente et sécurisée, conformément au RGPD.
+                    </p>
+                </section>
+
+                <section class="doc-section">
+                    <h4>2. Données collectées</h4>
+                    <p>
+                        Dans le cadre des inscriptions aux cercles de parole, nous collectons les données suivantes :
+                    </p>
+                    <ul>
+                        <li>Nom et prénom</li>
+                        <li>Adresse email</li>
+                        <li>Adresse IP (pour limiter les abus)</li>
+                    </ul>
+                    <p>
+                        Ces données sont nécessaires à l'organisation et à la gestion des cercles de parole.
+                    </p>
+                </section>
+
+                <section class="doc-section">
+                    <h4>3. Finalité du traitement</h4>
+                    <p>
+                        Vos données sont collectées et traitées pour les finalités suivantes :
+                    </p>
+                    <ul>
+                        <li>Gestion des inscriptions aux cercles de parole</li>
+                        <li>Communication des informations relatives aux événements</li>
+                        <li>Prévention des abus et des inscriptions frauduleuses</li>
+                        <li>Respect de nos obligations légales</li>
+                    </ul>
+                </section>
+
+                <section class="doc-section">
+                    <h4>4. Durée de conservation</h4>
+                    <p>
+                        Vos données personnelles sont conservées pendant une durée maximale de <strong>12 mois</strong> à compter de votre dernière inscription.
+                    </p>
+                    <p>
+                        Passé ce délai, vos données sont automatiquement supprimées de nos systèmes.
+                    </p>
+                </section>
+
+                <section class="doc-section">
+                    <h4>5. Cookies et traceurs</h4>
+                    <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded">
+                        <p class="font-semibold">
+                            ✓ Ce site n'utilise pas de cookies ni de traceurs publicitaires
+                        </p>
+                        <p>
+                            Nous ne collectons aucune donnée de navigation à des fins de tracking, de publicité ou d'analyse comportementale.
+                        </p>
+                    </div>
+                </section>
+
+                <section class="doc-section">
+                    <h4>6. Destinataires des données</h4>
+                    <p>
+                        Vos données personnelles sont uniquement accessibles :
+                    </p>
+                    <ul>
+                        <li>Aux membres du Collectif La Brèche en charge de l'organisation des cercles</li>
+                        <li>À Google (pour le stockage via Google Sheets, avec des mesures de sécurité appropriées)</li>
+                    </ul>
+                    <p>
+                        <strong>Vos données ne sont jamais vendues, louées ou cédées à des tiers</strong> à des fins commerciales ou publicitaires.
+                    </p>
+                </section>
+
+                <section class="doc-section">
+                    <h4>7. Vos droits</h4>
+                    <p>
+                        Conformément au RGPD et à la loi Informatique et Libertés, vous disposez des droits suivants :
+                    </p>
+                    <ul>
+                        <li><strong>Droit d'accès :</strong> obtenir une copie de vos données</li>
+                        <li><strong>Droit de rectification :</strong> corriger des données inexactes</li>
+                        <li><strong>Droit à l'effacement :</strong> demander la suppression de vos données</li>
+                        <li><strong>Droit d'opposition :</strong> vous opposer au traitement de vos données</li>
+                        <li><strong>Droit à la limitation :</strong> limiter le traitement de vos données</li>
+                        <li><strong>Droit à la portabilité :</strong> récupérer vos données dans un format structuré</li>
+                    </ul>
+                    <p>
+                        Pour exercer ces droits, contactez-nous à : <a href="mailto:labreche.rennes@gmail.com">labreche.rennes@gmail.com</a>
+                    </p>
+                </section>
+
+                <section class="doc-section">
+                    <h4>8. Sécurité</h4>
+                    <p>
+                        Nous mettons en œuvre des mesures techniques et organisationnelles appropriées pour protéger vos données contre tout accès non autorisé, perte, altération ou divulgation.
+                    </p>
+                </section>
+
+                <section class="doc-section">
+                    <h4>9. Contact & Réclamation</h4>
+                    <p>
+                        <strong>Responsable du traitement :</strong> Collectif La Brèche<br>
+                        <strong>Responsable légal du site :</strong> Denis Berthelot<br>
+                        <strong>Contact :</strong> <a href="mailto:labreche.rennes@gmail.com">labreche.rennes@gmail.com</a>
+                    </p>
+                    <p>
+                        Si vous estimez que vos droits ne sont pas respectés, vous pouvez introduire une réclamation auprès de la CNIL (Commission Nationale de l'Informatique et des Libertés) : <a href="https://www.cnil.fr" target="_blank" rel="noopener">www.cnil.fr</a>
+                    </p>
+                </section>
+            </div>
+            <div class="popup-footer">
+                <p class="text-sm text-gray-500">Dernière mise à jour : Octobre 2025</p>
+            </div>
+        </div>
+    </div>
+
     <!-- Le script a été déplacé vers un fichier externe -->    
     <script src="assets/js/script.js"></script>
     <script src="assets/js/mobile-menu.js"></script>
@@ -922,5 +1144,74 @@ Le cercle commencera à l'heure. Il s'ouvrira par une courte présentation.</p>
     <script src="assets/js/logo-transition.js"></script>
     <!-- Script de préchargement du logo pour l'animation -->
     <script src="assets/js/logo-preload.js"></script>
+    
+    <!-- Scripts pour les pop-ups Mentions Légales et Politique de confidentialité -->
+    <script>
+        // Fonction pour ouvrir la pop-up Mentions Légales
+        function openLegalPopup() {
+            const popup = document.getElementById('legal-popup');
+            if (popup) {
+                popup.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        // Fonction pour fermer la pop-up Mentions Légales
+        function closeLegalPopup() {
+            const popup = document.getElementById('legal-popup');
+            if (popup) {
+                popup.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+
+        // Fonction pour ouvrir la pop-up Politique de confidentialité
+        function openPrivacyPopup() {
+            const popup = document.getElementById('privacy-popup');
+            if (popup) {
+                popup.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        // Fonction pour fermer la pop-up Politique de confidentialité
+        function closePrivacyPopup() {
+            const popup = document.getElementById('privacy-popup');
+            if (popup) {
+                popup.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+
+        // Fermer les pop-ups en cliquant sur l'overlay
+        document.addEventListener('DOMContentLoaded', function() {
+            const legalPopup = document.getElementById('legal-popup');
+            const privacyPopup = document.getElementById('privacy-popup');
+
+            if (legalPopup) {
+                legalPopup.addEventListener('click', function(e) {
+                    if (e.target === legalPopup) {
+                        closeLegalPopup();
+                    }
+                });
+            }
+
+            if (privacyPopup) {
+                privacyPopup.addEventListener('click', function(e) {
+                    if (e.target === privacyPopup) {
+                        closePrivacyPopup();
+                    }
+                });
+            }
+
+            // Fermer avec la touche Échap
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeLegalPopup();
+                    closePrivacyPopup();
+                }
+            });
+        });
+    </script>
 </body>
 </html>

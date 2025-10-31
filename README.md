@@ -1,17 +1,17 @@
-# La Brèche - Site des Cercles d'Écoute
+# La Brèche - Site des Cercles de Parole
 
-Site web de l'association La Brèche de Rennes permettant l'affichage et l'inscription aux cercles d'écoute. Les événements sont gérés directement depuis un Google Sheet et affichés dynamiquement sur le site.
+Site web de l'association La Brèche de Rennes permettant l'affichage et l'inscription aux cercles de parole. Les événements sont gérés directement depuis un Google Sheet et affichés dynamiquement sur le site.
 
 ## Fonctionnalités
 
-- Affichage des cercles d'écoute disponibles avec leurs informations (thématique, lieu, date, places disponibles)
+- Affichage des cercles de parole disponibles avec leurs informations (thématique, lieu, date, places disponibles)
 - Chargement des données depuis Google Sheets
 - Interface responsive adaptée mobile/desktop
 - Thème personnalisé avec la charte graphique de La Brèche
 
 ## Structure des données
 
-Les cercles d'écoute sont structurés dans le Google Sheet comme suit :
+Les cercles de parole sont structurés dans le Google Sheet comme suit :
 - Chaque onglet = un cercle (sauf l'onglet "Historique des cercles" qui est exclu)
 - Cellules importantes dans chaque onglet :
   - C2 = Thématique du cercle

@@ -189,6 +189,113 @@ h1, h2, h3, h4 {
     justify-content: flex-end;
 }
 
+/* Document-style popups (Mentions légales / Politique de confidentialité) */
+.popup-content.popup-doc {
+    width: 100%;
+    max-width: 28rem; /* même gabarit que max-w-md de Tailwind */
+    max-height: 85vh;
+    border-radius: 16px; /* rounded-2xl */
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); /* shadow-2xl approx */
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden; /* pas de scroll horizontal */
+}
+
+/* Forcer l'habillage et éviter tout débordement horizontal interne */
+.popup-doc * {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    max-width: 100%;
+}
+
+.popup-doc .popup-header {
+    background: linear-gradient(to right, var(--primary), #665aa5);
+    color: #fff;
+    padding: 1rem 1.5rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.popup-doc .popup-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+    padding-right: 2rem;
+}
+
+.popup-doc .popup-close {
+    color: #fff;
+}
+
+.popup-doc .popup-close:hover {
+    color: #e5e7eb;
+}
+
+.popup-doc .popup-body {
+    padding: 1.5rem; /* p-6 */
+    overflow-y: auto;
+    overflow-x: hidden; /* pas de scroll horizontal */
+    -webkit-overflow-scrolling: touch; /* inertie iOS */
+    overscroll-behavior: contain; /* bloque le scroll chaining */
+    max-height: calc(85vh - 4rem);
+}
+
+.popup-doc .doc-section {
+    border-left: 4px solid var(--primary);
+    padding-left: 1rem;
+    width: 100%;
+    margin-left: 0 !important; /* annule la règle globale section */
+}
+
+.popup-doc .doc-section + .doc-section {
+    margin-top: 1.5rem;
+}
+
+.popup-doc h4 {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 0.75rem;
+}
+
+.popup-doc p {
+    color: #374151;
+    line-height: 1.625;
+}
+
+.popup-doc ul {
+    list-style: disc;
+    padding-left: 1.25rem;
+    color: #374151;
+    line-height: 1.625;
+    margin-top: 0.5rem;
+}
+
+.popup-doc a {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.popup-doc .popup-footer {
+    padding-top: 1.5rem;
+    border-top: 1px solid #e5e7eb;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .popup-content.popup-doc {
+        width: 100%;
+        max-width: 100%;
+        border-radius: 12px;
+    }
+    .popup-doc .popup-body {
+        padding: 1rem;
+        max-height: calc(85vh - 3.5rem);
+    }
+}
+
 /* Animation de déchirement */
 @keyframes tear-left {
     0% {
