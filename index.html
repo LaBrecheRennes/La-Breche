@@ -785,28 +785,22 @@ Le cercle commencera à l'heure. Il s'ouvrira par une courte présentation.</p>
                     </div>
                 </div>
                 
-                <form id="contact-popup-form" class="space-y-5">
+                <form id="contact-popup-form" class="space-y-5" data-emailjs="true">
                     <h2 class="text-xl font-semibold text-center mb-6">Une thématique à suggérer ou une question ?</h2>
                     
                     <div>
                         <label for="contact-popup-name" class="block mb-2 text-sm font-medium text-neutral-700">Nom / Prénom</label>
-                        <input type="text" name="name" id="contact-popup-name" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm py-2 px-4 border" placeholder="Votre nom" required>
+                        <input type="text" name="from_name" id="contact-popup-name" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm py-2 px-4 border" placeholder="Votre nom" required>
                     </div>
                     
                     <div>
                         <label for="contact-popup-email" class="block mb-2 text-sm font-medium text-neutral-700">Email</label>
-                        <input type="email" name="email" id="contact-popup-email" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm py-2 px-4 border" placeholder="votre@email.com" required>
+                        <input type="email" name="reply_to" id="contact-popup-email" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm py-2 px-4 border" placeholder="votre@email.com" required>
                     </div>
                     
                     <div>
                         <label for="contact-popup-subject" class="block mb-2 text-sm font-medium text-neutral-700">Sujet</label>
-                        <select name="subject" id="contact-popup-subject" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm py-2 px-4 border" required>
-                            <option value="">Sélectionnez un sujet</option>
-                            <option value="Suggestion de thématique">Suggestion de thématique</option>
-                            <option value="Question générale">Question générale</option>
-                            <option value="Problème d'inscription">Problème d'inscription</option>
-                            <option value="Autre">Autre</option>
-                        </select>
+                        <input type="text" name="subject" id="contact-popup-subject" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm py-2 px-4 border" placeholder="Sujet" required>
                     </div>
                     
                     <div>
@@ -818,6 +812,7 @@ Le cercle commencera à l'heure. Il s'ouvrira par une courte présentation.</p>
                         <span id="contact-popup-submit-text">Envoyer le message</span>
                         <div id="contact-popup-loading" class="hidden inline-block animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white ml-2"></div>
                     </button>
+                    <p id="form-status" class="text-sm text-center"></p>
                 </form>
                 
                 <!-- Message de succès après envoi -->
@@ -1212,6 +1207,56 @@ Le cercle commencera à l'heure. Il s'ouvrira par une courte présentation.</p>
                 }
             });
         });
+    </script>
+
+    <!-- EmailJS: envoi du formulaire de contact -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script>
+      (function(){
+        const form = document.getElementById('contact-popup-form');
+        if (!form) return;
+        // Init avec votre clé publique
+        emailjs.init('lLGGoXtUKzNqdXtuB');
+        const status = document.getElementById('form-status');
+        const btn = document.getElementById('contact-popup-submit-btn');
+        const loading = document.getElementById('contact-popup-loading');
+        const submitText = document.getElementById('contact-popup-submit-text');
+
+        form.addEventListener('submit', function(e){
+          e.preventDefault();
+          if (btn) btn.disabled = true;
+          if (loading) loading.classList.remove('hidden');
+          if (submitText) submitText.textContent = 'Envoi en cours...';
+          if (status) status.textContent = '';
+
+          emailjs.sendForm(
+            'service_77s5zub', // Service ID
+            'template_ibaxlk3', // Template ID
+            form
+          ).then(function(){
+            if (status) status.textContent = 'Merci, votre message a été envoyé ✅';
+            form.reset();
+            setTimeout(function(){
+              if (typeof closeContactPopup === 'function') {
+                closeContactPopup();
+              } else {
+                var overlay = document.getElementById('contact-popup');
+                if (overlay) {
+                  overlay.classList.remove('active');
+                  document.body.style.overflow = 'auto';
+                }
+              }
+            }, 1200);
+          }).catch(function(err){
+            console.error(err);
+            if (status) status.textContent = "Erreur d'envoi 😕";
+          }).finally(function(){
+            if (btn) btn.disabled = false;
+            if (loading) loading.classList.add('hidden');
+            if (submitText) submitText.textContent = 'Envoyer le message';
+          });
+        });
+      })();
     </script>
 </body>
 </html>

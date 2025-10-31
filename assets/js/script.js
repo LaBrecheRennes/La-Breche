@@ -1430,7 +1430,13 @@ function initializeContactForm() {
     const contactForm = document.getElementById('contact-popup-form');
     if (!contactForm) return;
     
-    contactForm.addEventListener('submit', handleContactFormSubmit);
+    // Si on utilise FormSubmit, ne pas intercepter la soumission
+    const action = (contactForm.getAttribute('action') || '').toLowerCase();
+    const isFormSubmit = action.includes('formsubmit.co');
+    const usesEmailJS = contactForm.hasAttribute('data-emailjs');
+    if (!isFormSubmit && !usesEmailJS) {
+        contactForm.addEventListener('submit', handleContactFormSubmit);
+    }
     
     // Gestionnaires pour fermer la pop-up
     const closeBtn = document.getElementById('close-contact-popup');
