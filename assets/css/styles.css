@@ -1,0 +1,919 @@
+:root {
+    --primary: #7A65BF;
+    --primary-dark: #6755A3;
+    --secondary: #F3ECDB;
+    --neutral-50: #F8F7F5;
+    --neutral-100: #F3ECDB;
+    --neutral-200: #E8E0D0;
+    --neutral-700: #4B4B4B;
+    --neutral-800: #383838;
+    --neutral-900: #2B2B2B;
+    
+    /* Hauteur du header (valeur fixe) */
+    --header-h: 72px;
+}
+
+body {
+    font-family: 'DM Sans', Arial, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    padding-top: var(--header-h, 72px); /* Décale le contenu sous le header fixe */
+    background: white;
+    overflow-x: hidden;
+}
+
+/* Correction globale pour éliminer les marges beiges */
+* {
+    box-sizing: border-box;
+}
+
+/* S'assurer que toutes les sections occupent toute la largeur */
+section {
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    box-sizing: border-box;
+}
+
+/* Correction des conteneurs max-width */
+.max-w-7xl, .max-w-6xl, .max-w-4xl, .max-w-2xl {
+    max-width: none !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding-left: max(1rem, calc((100vw - 1200px) / 2));
+    padding-right: max(1rem, calc((100vw - 1200px) / 2));
+}
+
+h1, h2, h3, h4 {
+    font-family: 'Playfair Display', serif;
+}
+
+.breche-line {
+    position: relative;
+    display: inline-block;
+}
+
+.breche-line::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -8px;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary), transparent);
+}
+
+.breche-accent {
+    position: relative;
+    z-index: 1;
+}
+
+.breche-accent::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: -20px;
+    right: -20px;
+    bottom: -10px;
+    background: linear-gradient(90deg, rgba(59, 130, 246, 0.1), transparent);
+    z-index: -1;
+    border-radius: 20px;
+}
+
+.card-hover {
+    transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+.gradient-bg {
+    background: linear-gradient(120deg, #EBF4FF, #F0FDF4);
+}
+
+.wave-pattern {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 15%;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%23ffffff' fill-opacity='1' d='M0,192L60,202.7C120,213,240,235,360,218.7C480,203,600,149,720,149.3C840,149,960,203,1080,213.3C1200,224,1320,192,1380,176L1440,160L1440,320L1380,320C1320,320,1200,320,1080,320C960,320,840,320,720,320C600,320,480,320,360,320C240,320,120,320,60,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
+    background-size: cover;
+}
+
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.popup-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.popup-content {
+    background: white;
+    width: 90%;
+    max-width: 500px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    position: relative;
+    transform: translateY(20px);
+    opacity: 0;
+    transition: transform 0.4s ease, opacity 0.4s ease;
+}
+
+.popup-overlay.active .popup-content {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem;
+    border-bottom: 1px solid var(--neutral-200);
+}
+
+.popup-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--neutral-700);
+    font-size: 1.5rem;
+    padding: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease;
+}
+
+.popup-close:hover {
+    color: var(--neutral-900);
+}
+
+.popup-body {
+    padding: 1.5rem;
+}
+
+.popup-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--neutral-200);
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* Document-style popups (Mentions légales / Politique de confidentialité) */
+.popup-content.popup-doc {
+    width: 100%;
+    max-width: 28rem; /* même gabarit que max-w-md de Tailwind */
+    max-height: 85vh;
+    border-radius: 16px; /* rounded-2xl */
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); /* shadow-2xl approx */
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden; /* pas de scroll horizontal */
+}
+
+/* Forcer l'habillage et éviter tout débordement horizontal interne */
+.popup-doc * {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    max-width: 100%;
+}
+
+.popup-doc .popup-header {
+    background: linear-gradient(to right, var(--primary), #665aa5);
+    color: #fff;
+    padding: 1rem 1.5rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.popup-doc .popup-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+    padding-right: 2rem;
+}
+
+.popup-doc .popup-close {
+    color: #fff;
+}
+
+.popup-doc .popup-close:hover {
+    color: #e5e7eb;
+}
+
+.popup-doc .popup-body {
+    padding: 1.5rem; /* p-6 */
+    overflow-y: auto;
+    overflow-x: hidden; /* pas de scroll horizontal */
+    -webkit-overflow-scrolling: touch; /* inertie iOS */
+    overscroll-behavior: contain; /* bloque le scroll chaining */
+    max-height: calc(85vh - 4rem);
+}
+
+.popup-doc .doc-section {
+    border-left: 4px solid var(--primary);
+    padding-left: 1rem;
+    width: 100%;
+    margin-left: 0 !important; /* annule la règle globale section */
+}
+
+.popup-doc .doc-section + .doc-section {
+    margin-top: 1.5rem;
+}
+
+.popup-doc h4 {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 0.75rem;
+}
+
+.popup-doc p {
+    color: #374151;
+    line-height: 1.625;
+}
+
+.popup-doc ul {
+    list-style: disc;
+    padding-left: 1.25rem;
+    color: #374151;
+    line-height: 1.625;
+    margin-top: 0.5rem;
+}
+
+.popup-doc a {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.popup-doc .popup-footer {
+    padding-top: 1.5rem;
+    border-top: 1px solid #e5e7eb;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .popup-content.popup-doc {
+        width: 100%;
+        max-width: 100%;
+        border-radius: 12px;
+    }
+    .popup-doc .popup-body {
+        padding: 1rem;
+        max-height: calc(85vh - 3.5rem);
+    }
+}
+
+/* Animation de déchirement */
+@keyframes tear-left {
+    0% {
+        transform: translateX(0) rotate(0deg);
+        clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    }
+    100% {
+        transform: translateX(-100%) rotate(-5deg);
+        clip-path: polygon(0 0, 95% 0, 85% 100%, 0 100%);
+    }
+}
+
+@keyframes tear-right {
+    0% {
+        transform: translateX(0) rotate(0deg);
+        clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    }
+    100% {
+        transform: translateX(100%) rotate(5deg);
+        clip-path: polygon(5% 0, 100% 0, 100% 100%, 15% 100%);
+    }
+}
+
+/* Animation de pulsation anxiogène pour les phrases empilées */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    50% {
+        transform: scale(1.02);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+}
+
+.tear-left {
+    animation: tear-left 1.5s forwards;
+    transform-origin: left center;
+}
+
+.tear-right {
+    animation: tear-right 1.5s forwards;
+    transform-origin: right center;
+}
+
+.paper-edge {
+    position: relative;
+    overflow: hidden;
+}
+
+/* Barre blanche supprimée sur demande de l'utilisateur */
+
+/* Styles pour les animations au scroll */
+.scroll-animated {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.scroll-animated.from-left {
+    transform: translateX(-50px);
+}
+
+.scroll-animated.from-right {
+    transform: translateX(50px);
+}
+
+.scroll-animated.from-bottom {
+    transform: translateY(100px);
+}
+
+.scroll-animated.fade-in {
+    transform: scale(0.9);
+}
+
+.scroll-animated.visible {
+    opacity: 1;
+    transform: translate(0) scale(1);
+}
+
+.staggered-delay-1 { transition-delay: 0.2s; }
+.staggered-delay-2 { transition-delay: 0.4s; }
+.staggered-delay-3 { transition-delay: 0.6s; }
+
+/* Contenu principal (caché au début) */
+.content {
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+    transition-delay: 1s;
+}
+
+.show-content {
+    opacity: 1;
+}
+
+.charter-coverflow-container {
+    position: relative;
+    perspective: 1000px;
+    transform-style: preserve-3d;
+    isolation: isolate; /* évite des surprises de stacking */
+    perspective-origin: center center;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    height: 320px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    touch-action: pan-y;   /* autorise scroll vertical de la page, bloque le pan-x par défaut */
+    user-select: none;
+}
+
+.charter-card {
+    position: absolute;
+    width: 140px;
+    height: 200px;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    will-change: transform, background-image, box-shadow;
+    cursor: pointer;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.charter-card .card-content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 1rem;
+    color: white;
+    font-weight: bold;
+}
+
+.charter-card .card-icon {
+    margin-bottom: 0.5rem;
+}
+
+.charter-card .card-title {
+    font-size: 0.75rem;
+    line-height: 1.1;
+}
+
+/* Media queries pour la responsivité */
+@media (max-width: 768px) {
+    /* Correction spécifique mobile pour les sections */
+    section {
+        margin-left: 0 !important;
+        width: 100% !important;
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+    
+    /* Conteneurs mobiles */
+    .max-w-7xl, .max-w-6xl, .max-w-4xl, .max-w-2xl {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+    
+    /* Charter coverflow */
+    .charter-coverflow-container {
+        height: 220px;
+        max-width: 100%;
+        perspective: 800px;
+    }
+    
+    .charter-card {
+        width: 90px;
+        height: 130px;
+    }
+    
+    .charter-card .card-content {
+        padding: 0.5rem;
+    }
+    
+    .charter-card .card-icon svg {
+        width: 1rem;
+        height: 1rem;
+    }
+    
+    .charter-card .card-title {
+        font-size: 0.6rem;
+    }
+}
+
+/* Media queries pour tablettes */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .max-w-7xl, .max-w-6xl, .max-w-4xl, .max-w-2xl {
+        padding-left: 2rem !important;
+        padding-right: 2rem !important;
+    }
+}
+
+/* ===== CSS DÉPLACÉ DEPUIS LE HTML POUR NETTOYAGE ===== */
+
+/* Animation de déchirure mignonne en deux parties */
+.cute-split-animation {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    pointer-events: none;
+}
+
+.split-half {
+    position: absolute;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(135deg, #f3ecdb 0%, #7A65BF 100%);
+    transition: transform 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.split-left {
+    left: 0;
+    transform-origin: left center;
+    clip-path: polygon(0 0, 100% 0, 85% 100%, 0 100%);
+}
+
+.split-right {
+    right: 0;
+    transform-origin: right center;
+    clip-path: polygon(15% 0, 100% 0, 100% 100%, 0 100%);
+}
+
+.split-left.animate {
+    transform: translateX(-100%) rotateY(-15deg);
+}
+
+.split-right.animate {
+    transform: translateX(100%) rotateY(15deg);
+}
+
+/* Smooth scroll pour les ancres */
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: -20px; /* Valeur négative pour positionner plus haut */
+}
+
+/* Corrige les ancres (redondant mais utile si scrolling par script) */
+section[id], div[id] {
+    scroll-margin-top: -20px; /* Même valeur négative */
+}
+
+/* Amélioration des transitions */
+.cercle-item {
+    transition: all 0.3s ease !important;
+}
+
+/* Logo background transition animation */
+.logo-transition-section {
+    position: relative;
+    overflow: hidden;
+}
+
+.logo-background-transition {
+    transition: opacity 2s ease-in-out, transform 3s ease-in-out;
+    animation: logoFloat 6s ease-in-out infinite;
+}
+
+.logo-transition-section:hover .logo-background-transition {
+    opacity: 0.4 !important;
+    transform: scale(1.1);
+}
+
+@keyframes logoFloat {
+    0%, 100% { 
+        transform: translateY(0px) scale(1);
+        opacity: 0.2;
+    }
+    50% { 
+        transform: translateY(-10px) scale(1.05);
+        opacity: 0.35;
+    }
+}
+
+/* Amélioration de la transition vers la dernière section */
+.logo-transition-section::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    background: linear-gradient(to bottom, transparent, rgba(43, 43, 43, 0.1));
+    pointer-events: none;
+}
+
+/* Correction du décalage initial global */
+#tear-animation, #text-overlay {
+    left: 0 !important;
+    right: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Animation de révélation de la brèche */
+.breach-reveal-animation {
+    clip-path: inset(0 0 100% 0);
+    -webkit-clip-path: inset(0 0 100% 0);
+    animation: clipDown 2.5s ease-out forwards;
+    -webkit-animation: clipDown 2.5s ease-out forwards;
+}
+
+@keyframes clipDown {
+    from { clip-path: inset(0 0 100% 0); }
+    to   { clip-path: inset(0 0 0 0); }
+}
+
+@-webkit-keyframes clipDown {
+    from { -webkit-clip-path: inset(0 0 100% 0); }
+    to   { -webkit-clip-path: inset(0 0 0 0); }
+}
+
+/* CSS MANQUANTS - Animations de déchirure des rideaux */
+@keyframes tearLeft {
+    to { transform: translateX(-110%); }
+}
+
+@keyframes tearRight {
+    to { transform: translateX(110%); }
+}
+
+.tear-left {
+    animation: tearLeft 1s ease forwards;
+}
+
+.tear-right {
+    animation: tearRight 1s ease forwards;
+}
+
+/* Media queries spécifiques pour mobile */
+@media (max-width: 768px) {
+    /* Amélioration de l'animation de départ mobile */
+    .cute-split-animation .split-half {
+        clip-path: none !important;
+    }
+    
+    .cute-split-animation .split-left {
+        transform-origin: center !important;
+    }
+    
+    .cute-split-animation .split-right {
+        transform-origin: center !important;
+    }
+    
+    .cute-split-animation .split-left.animate {
+        transform: translateY(-100%) !important;
+    }
+    
+    .cute-split-animation .split-right.animate {
+        transform: translateY(100%) !important;
+    }
+    
+    /* Correction du centrage initial */
+    #text-overlay {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    
+    #text-overlay > div {
+        position: static !important;
+        transform: none !important;
+    }
+    
+    .cercle-item {
+        min-height: 400px !important;
+        padding: 1rem !important;
+    }
+    
+    .cercle-titre {
+        font-size: 1.25rem !important;
+        margin-bottom: 1rem !important;
+    }
+    
+    .space-y-6 > * + * {
+        margin-top: 1rem !important;
+    }
+    
+    /* Animation de déchirure mobile */
+    #tear-animation {
+        flex-direction: column;
+    }
+    
+    #left-half, #right-half {
+        width: 100% !important;
+        height: 50% !important;
+        padding: 1rem !important;
+    }
+    
+    #left-half {
+        justify-content: center !important;
+        text-align: center !important;
+    }
+    
+    #right-half {
+        justify-content: center !important;
+        text-align: center !important;
+    }
+    
+    #logo-center {
+        width: 200px !important;
+        height: 200px !important;
+    }
+    
+    /* Header mobile */
+    .sticky {
+        padding: 0.5rem 1rem !important;
+    }
+    
+    /* Hero section mobile */
+    .py-24 {
+        padding-top: 3rem !important;
+        padding-bottom: 3rem !important;
+    }
+    
+    /* Grid des cercles mobile */
+    .md\:grid-cols-3 {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+    }
+    
+    /* Popup mobile */
+    .popup-overlay {
+        padding: 1rem !important;
+    }
+    
+    .popup-content {
+        max-width: 95vw !important;
+        margin: 0 !important;
+    }
+}
+
+/* Amélioration des transitions de fond pour éviter les ruptures visibles */
+.seamless-transition {
+    position: relative;
+}
+
+.seamless-transition::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(to right, transparent, rgba(122, 101, 191, 0.3), transparent);
+    z-index: 1;
+}
+
+.seamless-transition::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(to right, transparent, rgba(122, 101, 191, 0.3), transparent);
+    z-index: 1;
+}
+
+/* Animation simplifiée pour l'ouverture du site */
+@keyframes simpleDoorLeft {
+    0% { 
+        transform: translateX(0);
+        opacity: 1;
+    }
+    100% { 
+        transform: translateX(-100%);
+        opacity: 0.8;
+    }
+}
+
+@keyframes simpleDoorRight {
+    0% { 
+        transform: translateX(0);
+        opacity: 1;
+    }
+    100% { 
+        transform: translateX(100%);
+        opacity: 0.8;
+    }
+}
+
+@keyframes logoSimpleZoom {
+    0% { 
+        opacity: 1; 
+        transform: scale(1);
+    }
+    100% { 
+        opacity: 1; 
+        transform: scale(1.1);
+    }
+}
+
+@keyframes textSimpleFade {
+    0% { 
+        opacity: 1; 
+        transform: translateY(0);
+    }
+    100% { 
+        opacity: 0; 
+        transform: translateY(-10px);
+    }
+}
+
+/* Effet de particules féminines (optionnel) */
+@keyframes floatingParticles {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 0;
+    }
+    20% {
+        opacity: 0.6;
+    }
+    80% {
+        opacity: 0.6;
+    }
+    100% {
+        transform: translateY(-100vh) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+.organic-door-left {
+    animation: simpleDoorLeft 1.2s ease-out forwards;
+}
+
+.organic-door-right {
+    animation: simpleDoorRight 1.2s ease-out forwards;
+}
+
+.logo-fade-out {
+    /* Classe conservée pour compatibilité mais pas utilisée */
+    opacity: 1;
+}
+
+.logo-bloom {
+    animation: logoSimpleZoom 1.2s ease-out forwards;
+}
+
+.text-fade-out {
+    animation: textSimpleFade 0.5s ease-out forwards;
+}
+
+.text-gentle-fade {
+    animation: textSimpleFade 0.5s ease-out forwards;
+}
+
+/* Amélioration des cartes d'inscription avec backdrop-blur */
+.inscription-card {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+/* Styles pour les logos du header */
+/* Taille du bloc logo (responsive) */
+.header-logo-container{
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: auto;
+  min-width: 240px;
+  /* hauteur explicite */
+  height: 64px;
+}
+@media (min-width: 768px){ .header-logo-container{ height: 72px; } }
+@media (min-width:1024px){ .header-logo-container{ height: 84px; } }
+
+/* Les deux images se superposent et prennent 100% de la hauteur du conteneur */
+.header-logo{
+  position: absolute;
+  inset: 0 auto 0 0;   /* top:0; bottom:0; left:0 */
+  margin: auto 0;
+  height: 100%;
+  width: auto;
+  max-height: 100%;
+  object-fit: contain;
+  transition: opacity 300ms ease;
+  background: transparent;
+}
+
+.initial-logo {
+    opacity: 1;
+}
+
+.final-logo {
+    opacity: 0;
+}
+
+/* Styles pour le drag-to-scroll des cartes de la charte */
+.charter-coverflow-container{
+  /* évite la sélection de texte et active un drag fluide */
+  user-select: none;
+  cursor: grab;
+  /* laisse le scroll vertical de la page, on capte l'horizontal pour le drag */
+  touch-action: pan-y;
+}
+
+.charter-coverflow-container.dragging{
+  cursor: grabbing;
+}
+
+.inscription-card:hover {
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    transform: translateY(-2px);
+}
+
