@@ -393,7 +393,7 @@ async function loadCirclesData() {
         const circleSheets = sheets.filter(sheet => 
             sheet.properties && 
             sheet.properties.title && 
-            sheet.properties.title !== "Historique des cercles" &&
+            sheet.properties.title !== "Historique des cercles" && 
             sheet.properties.title.toLowerCase() !== "masque"
         );
         
@@ -459,30 +459,86 @@ async function loadCirclesData() {
         
         console.log(`Total des cercles chargés: ${circlesData.length}`);
         
+        // Filtrer les cercles dont la date est passée
+        const now = new Date();
+        now.setHours(0, 0, 0, 0); // Début de la journée
+        
+        const futureCircles = circlesData.filter(circle => {
+            const circleDate = parseDateFromString(circle.date);
+            if (!circleDate) {
+                console.log(`Date non parsable pour ${circle.nom}: "${circle.date}" - cercle conservé par défaut`);
+                return true; // Conserver les cercles avec date non parsable
+            }
+            const isPast = circleDate < now;
+            if (isPast) {
+                console.log(`Cercle "${circle.nom}" exclu car date passée: ${circle.date}`);
+            }
+            return !isPast;
+        });
+        
+        console.log(`Cercles après filtrage des dates passées: ${futureCircles.length}`);
+        
         // Si aucun cercle n'a été chargé, lancer une erreur
-        if (circlesData.length === 0) {
-            throw new Error('Aucun cercle n\'a pu être chargé');
+        if (futureCircles.length === 0) {
+            throw new Error('Aucun cercle à venir');
         }
         
         // Trier les cercles par ordre chronologique
-        return sortCirclesByDate(circlesData);
+        return sortCirclesByDate(futureCircles);
     } catch (error) {
         console.error('Erreur lors du chargement des cercles:', error);
         
-        // En cas d'erreur, retourner des données de test pour ne pas bloquer le site
-        return sortCirclesByDate([
-            {
-                id: 'cercle-test',
-                nom: 'Cercle Test (données de secours)',
-                date: '1er janvier 2026',  // Date future pour les tests
-                lieu: 'Lieu à confirmer',
-                referentes: 'Equipe La Brèche',
-                description: 'Les données réelles n\'ont pas pu être chargées. Vérifiez l\'accès au Google Sheet.',
-                places_disponibles: 10,
-                places_totales: 20
-            }
-        ]);
+        // En cas d'erreur, retourner un tableau vide pour afficher le message "pas de cercles"
+        return [];
     }
+}
+
+/**
+ * Parse une date depuis une chaîne de texte (format: "26/11/2025 - 19h-21h" ou autres formats)
+ * @param {string} dateString - Chaîne contenant la date
+ * @returns {Date|null} - Objet Date ou null si non parsable
+ */
+function parseDateFromString(dateString) {
+    if (!dateString || typeof dateString !== 'string') return null;
+    
+    // Format: "26/11/2025 - 19h-21h" ou "26/11/2025"
+    const slashFormat = dateString.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+    if (slashFormat) {
+        const day = parseInt(slashFormat[1], 10);
+        const month = parseInt(slashFormat[2], 10) - 1; // Mois 0-indexé
+        const year = parseInt(slashFormat[3], 10);
+        return new Date(year, month, day);
+    }
+    
+    // Format: "15 octobre 2025" ou "15 oct 2025"
+    const frenchFormat = dateString.match(/(\d{1,2})\s+(\w+)\s+(\d{4})/);
+    if (frenchFormat) {
+        const day = parseInt(frenchFormat[1], 10);
+        const monthName = frenchFormat[2].toLowerCase();
+        const year = parseInt(frenchFormat[3], 10);
+        
+        const months = {
+            'janvier': 0, 'janv': 0, 'jan': 0,
+            'février': 1, 'fevrier': 1, 'fév': 1, 'fev': 1,
+            'mars': 2, 'mar': 2,
+            'avril': 3, 'avr': 3,
+            'mai': 4,
+            'juin': 5,
+            'juillet': 6, 'juil': 6,
+            'août': 7, 'aout': 7,
+            'septembre': 8, 'sept': 8, 'sep': 8,
+            'octobre': 9, 'oct': 9,
+            'novembre': 10, 'nov': 10,
+            'décembre': 11, 'decembre': 11, 'déc': 11, 'dec': 11
+        };
+        
+        const month = months[monthName];
+        if (month !== undefined) {
+            return new Date(year, month, day);
+        }
+    }
+    
+    return null;
 }
 
 /**
@@ -650,15 +706,46 @@ function renderCircles() {
     // Log le nombre de cercles chargés uniquement dans la console
     console.log(`Nombre de cercles chargés : ${circles.length}`);
     
+    // Adapter la grille selon le nombre de cercles (centrer si 1 ou 2 cercles)
+    container.className = 'grid gap-6 lg:gap-8';
+    if (circles.length === 0) {
+        container.classList.add('place-items-center');
+    } else if (circles.length === 1) {
+        container.classList.add('md:grid-cols-1', 'max-w-md', 'mx-auto');
+    } else if (circles.length === 2) {
+        container.classList.add('md:grid-cols-2', 'max-w-3xl', 'mx-auto');
+    } else {
+        container.classList.add('md:grid-cols-3');
+    }
+    
     // Si aucun cercle n'est disponible
     if (circles.length === 0) {
         container.innerHTML = `
-            <div class="col-span-2 text-center py-8 bg-blue-50 border border-blue-200 rounded-lg">
-                <svg class="mx-auto h-12 w-12 text-blue-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            <div class="col-span-full text-center py-10 px-6 bg-gradient-to-br from-purple-50 to-blue-50 border border-purple-200 rounded-2xl shadow-sm max-w-xl mx-auto">
+                <svg class="mx-auto h-16 w-16 text-[#7A65BF] mb-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
-                <h4 class="text-lg font-medium text-blue-800 mb-2">Aucun cercle disponible</h4>
-                <p class="text-blue-700">Revenez bientôt pour découvrir nos prochains cercles.</p>
+                <h4 class="text-xl font-semibold text-[#7A65BF] mb-3">Les cercles seront bientôt de retour !</h4>
+                <p class="text-gray-600 mb-6 max-w-md mx-auto">
+                    Nous préparons de nouveaux cercles d'écoute pour vous accueillir. 
+                    En attendant, suivez-nous pour ne rien manquer !
+                </p>
+                <div class="flex flex-col sm:flex-row gap-3 justify-center items-center">
+                    <a href="https://www.instagram.com/labreche_rennes/" target="_blank" rel="noopener noreferrer" 
+                       class="inline-flex items-center px-5 py-2.5 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-medium rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all shadow-md hover:shadow-lg">
+                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                        </svg>
+                        @labreche_rennes
+                    </a>
+                    <a href="https://www.cridev.org/" target="_blank" rel="noopener noreferrer" 
+                       class="inline-flex items-center px-5 py-2.5 bg-white text-[#7A65BF] font-medium rounded-lg border-2 border-[#7A65BF] hover:bg-[#7A65BF] hover:text-white transition-all shadow-md hover:shadow-lg">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                        </svg>
+                        Découvrir le CRIDEV
+                    </a>
+                </div>
             </div>
         `;
         return;
