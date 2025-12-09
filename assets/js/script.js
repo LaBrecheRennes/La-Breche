@@ -389,11 +389,12 @@ async function loadCirclesData() {
         const sheets = sheetsData.sheets || [];
         console.log(`Nombre total d'onglets: ${sheets.length}`);
         
-        // 2. Filtrer les onglets (exclure "Historique des cercles")
+        // 2. Filtrer les onglets (exclure "Historique des cercles" et "masque")
         const circleSheets = sheets.filter(sheet => 
             sheet.properties && 
             sheet.properties.title && 
-            sheet.properties.title !== "Historique des cercles"
+            sheet.properties.title !== "Historique des cercles" &&
+            sheet.properties.title.toLowerCase() !== "masque"
         );
         
         console.log(`Nombre d'onglets après filtrage: ${circleSheets.length}`);
@@ -977,6 +978,13 @@ function initializeForm() {
     const popupOverlay = document.getElementById('inscription-popup');
     
     if (!popupForm) return;
+    
+    // Éviter d'ajouter plusieurs fois le même event listener
+    if (popupForm.dataset.formInitialized === 'true') {
+        console.log('Formulaire déjà initialisé, skip');
+        return;
+    }
+    popupForm.dataset.formInitialized = 'true';
     
     popupForm.addEventListener('submit', function(e) {
         e.preventDefault();
